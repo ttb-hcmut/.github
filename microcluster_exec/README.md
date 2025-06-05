@@ -26,6 +26,17 @@ make install
 opam install ./
 ```
 
+### Run
+
+Assume you've installed:
+
+```
+$ microcluster_exec 
+usage: microcluster_exec [-hv] -F PORT FILENAME
+```
+
+Refer manual / documentation for more information.
+
 ### Test
 
 ```sh
