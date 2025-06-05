@@ -1,0 +1,4 @@
+(executable
+ (public_name microcluster_exec)
+ (name main)
+ (libraries microcluster_exec))
