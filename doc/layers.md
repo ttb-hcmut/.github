@@ -42,6 +42,10 @@ if __name__ == "__main__":
     async.run(main())
 ```
 
+## Layer 3.5
+
+Session-based IPC message-broker / socket library
+
 ## Layer 3
 
 Task distributor
