@@ -21,9 +21,9 @@ File: `lib/process_unet_nodek.py`
 
 ```python
 import numpy
-import microcluster
+import microcluster_canvas
 
-@microcluster.mark()
+@microcluster_canvas.parallel()
 async def main():
     # ...
 ```
