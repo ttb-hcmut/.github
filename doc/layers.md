@@ -17,7 +17,7 @@ def main():
 
 Parallelize machine-learning program. Translate neural network to pipelines. Expect some kind of structured concurrency (async, thread (?))
 
-File: `lib/process_unet_nodek.py`
+File: `process_unet_nodek.py`
 
 ```python
 import numpy
@@ -32,11 +32,14 @@ File: `main.py`
 
 ```python
 #!/usr/bin/env python3
-from lib.process_unet_nodek import main as process_unet_nodek
-import asyncio.async as async
+from process_unet_nodek import main as process_unet_nodek
+import asyncio
 
-def main():
-    async.run(process_unet_nodek)
+async def main():
+    await process_unet_nodek()
+
+if __name__ == "__main__":
+    async.run(main())
 ```
 
 ## Layer 3
