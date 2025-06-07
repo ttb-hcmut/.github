@@ -37,8 +37,7 @@ let () =
   Switch.run @@ fun sw ->
   begin Fiber.fork ~sw @@ fun () ->
     seq |> Seq.fold_left (fun _ x ->
-      Fs_socket.reply x @@ fun request ->
-      let open Request in
+      Fs_socket.reply x @@ fun _ ->
       Response.make 1
     ) ()
     |> ignore
