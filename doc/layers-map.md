@@ -5,6 +5,6 @@ Modules and how they map to the Micro-cluster stack. Useful for work assignment
 | Layer 5 | x                 | x                   |           |       |
 | Layer 4 | x                 | x                   | x         |       |
 | Layer 3 | x                 |                     | x         |       |
-| Layer 2 | x                 |                     |           |       | 
+| Layer 2 |                   |                     |           |       | 
 | Layer 1 |                   |                     |           | x     |
 | Layer 0 |                   |                     |           |       |
