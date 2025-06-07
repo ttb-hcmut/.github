@@ -17,6 +17,8 @@ def main():
 
 Parallelize machine-learning program. Translate neural network to pipelines. Expect some kind of structured concurrency (async, thread (?))
 
+Python / OCaml code generation, transformation
+
 File: `process_unet_nodek.py`
 
 ```python
