@@ -19,11 +19,12 @@ end
 let all ~process_mgr ~ejsont ~fjsont ~vardir ~session_name ~sw =
   let open Eio in
   let dir = Path.(vardir / "fs_socket" / session_name)
+  and stat_dircheck, end_dircheck = Promise.create ()
   and cache = Hashtbl.create 100
   and requests = Stream.create 0 in
   ( Fiber.fork ~sw @@ fun () ->
     Switch.run @@ fun sw ->
-    while true; do
+    while not (Promise.is_resolved stat_dircheck); do
       Path.read_dir dir
       |> Fiber.List.iter @@ fun inode ->
       let open Stream_syntax in
@@ -66,5 +67,6 @@ let all ~process_mgr ~ejsont ~fjsont ~vardir ~session_name ~sw =
     | Some v -> Seq.Cons (v, next)
   and stop () =
     let open Stream_syntax in
-    !| requests in
+    Promise.resolve end_dircheck ()
+    ; !| requests in
   next, stop
