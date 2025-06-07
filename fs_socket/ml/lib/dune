@@ -1,3 +1,4 @@
 (library
  (libraries eio jsont jsont.bytesrw)
+ (public_name fs_socket)
  (name fs_socket))
