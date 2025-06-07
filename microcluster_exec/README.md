@@ -1,8 +1,11 @@
 ## Develop
 
-Requirements:
+Build Dependencies:
 - dune
 - GNU Make (optional)
+
+Runtime Dependencies:
+- mpremote
 
 ### Build
 

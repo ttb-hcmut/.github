@@ -1,2 +1,3 @@
 (library
+ (libraries eio fpath)
  (name microcluster_exec))

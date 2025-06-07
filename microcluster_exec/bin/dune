@@ -1,4 +1,4 @@
 (executable
  (public_name microcluster_exec)
  (name main)
- (libraries microcluster_exec))
+ (libraries microcluster_exec eio eio_main cmdliner))
