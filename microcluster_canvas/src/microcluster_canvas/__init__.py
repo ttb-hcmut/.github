@@ -6,15 +6,16 @@ import os
 import uuid
 
 class FunctionTask():
-  def __init__(self, func):
+  def __init__(self, func, args):
     self.func = func
+    self.args = args
     self.name = f"{self.func.__name__}-{uuid.uuid4()}"
 
   def __str__(self):
     return json.dumps(self.to_dict())
 
   def to_dict(self):
-    info = { 'module_name': self.func.__module__, 'function_name': self.func.__name__, 'cwd': os.getcwd() }
+    info = { 'module_name': self.func.__module__, 'function_name': self.func.__name__, 'actual_arguments': self.args, 'cwd': os.getcwd() }
     return info
 
 def get_uclustr_env():
@@ -36,7 +37,7 @@ def _parallel_decorator_factory(*arg):
     def wrapper(*args, **kwargs):
       if env is None:
         return func(*args, **kwargs)
-      task = FunctionTask(func)
+      task = FunctionTask(func, { 'args': args, 'kwargs': kwargs })
       async def work():
         reply = await fs_socket.comm(env['session_name'], task.name, task.to_dict())
         retval = reply['return_value']

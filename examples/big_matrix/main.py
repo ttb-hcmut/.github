@@ -3,7 +3,7 @@ import asyncio
 from process import process
 
 async def main():
-  a = await process()
+  a = await process(5, debug=True)
   print(a)
 
 if __name__ == "__main__":
