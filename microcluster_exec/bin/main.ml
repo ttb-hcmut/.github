@@ -1,42 +1,5 @@
 open Microcluster_exec;;
 
-module Response = struct
-  type t = { return_value: int }
-  let make return_value = { return_value }
-  let return_value t = t.return_value
-  let jsont =
-    let open Jsont in
-    Object.map make
-    |> Object.mem "return_value" Jsont.int ~enc:return_value
-    |> Object.finish
-end
-
-module Path0 = struct
-  let jsont ~fs = 
-    let open Jsont in
-    of_of_string @@ fun str -> Eio.Path.(fs / str) |> Result.ok
-end
-
-module Request = struct
-  type t =
-    { module_name: string
-    ; function_name: string
-    ; cwd: Eio.(Fs.dir_ty Path.t)
-    }
-  let make module_name function_name cwd =
-    { module_name; function_name; cwd }
-  let module_name t = t.module_name
-  let function_name t = t.module_name
-  let cwd t = t.cwd
-  let jsont ~fs =
-    let open Jsont in
-    Object.map make
-    |> Object.mem "module_name" Jsont.string ~enc:module_name
-    |> Object.mem "function_name" Jsont.string ~enc:function_name
-    |> Object.mem "cwd" (Path0.jsont ~fs) ~enc:cwd
-    |> Object.finish
-end
-
 type 'a backend =
   { process_mgr : 'a Eio.Process.mgr_ty Eio.Resource.t
   ; command: Command.t
@@ -103,18 +66,19 @@ let main ~device command =
   |> function
   | `LanguageOCaml  -> failwith "OCaml is not supported yet"
   | `LanguagePython ->
+  let module Rpc = (val Controller_make.of_id "micropython": Controller.Rpc) in
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
-  Fs_socket.Namespace_watch.all ~process_mgr ~vardir ~ejsont:Response.jsont ~fjsont:(Request.jsont ~fs:(Stdenv.fs env)) ~session_name ~sw
+  Fs_socket.Namespace_watch.all ~process_mgr ~vardir ~ejsont:Rpc.Result.jsont ~fjsont:Rpc.Input.jsont ~session_name ~sw
   |> function seq, stop_hosting ->
   ( Fiber.fork ~sw @@ fun () ->
-    seq |> Seq.iter @@ fun ctx ->
-    Fs_socket.reply ctx @@ fun request ->
-    let open Request in
-    request.module_name |> ignore;
-    request.function_name |> ignore;
-    request.cwd |> ignore;
-    Response.make 1
+    Switch.run @@ fun sw ->
+    seq |> Seq.fold_left begin fun _ ctx ->
+      Fiber.fork ~sw @@ fun () ->
+      Fs_socket.reply ctx @@ fun inp ->
+      Rpc.fold_left inp
+    end ()
+    |> ignore
   );
   ( Fiber.fork ~sw @@ fun () ->
     backend_run ~backend;

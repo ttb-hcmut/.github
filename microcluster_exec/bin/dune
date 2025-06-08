@@ -1,4 +1,4 @@
 (executable
  (public_name microcluster_exec)
  (name main)
- (libraries microcluster_exec jsont fs_socket eio eio_main cmdliner uuidm))
+ (libraries microcluster_exec controller_make jsont fs_socket eio eio_main cmdliner uuidm))
