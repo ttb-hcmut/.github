@@ -1,4 +1,5 @@
 import asyncio.coroutines as c
+import ast
 import fs_socket
 import json
 import inspect
@@ -40,7 +41,7 @@ def _parallel_decorator_factory(*arg):
       task = FunctionTask(func, { 'args': args, 'kwargs': kwargs })
       async def work():
         reply = await fs_socket.comm(env['session_name'], task.name, task.to_dict())
-        retval = reply['return_value']
+        retval = ast.literal_eval(reply['return_value'])
         return retval
       return work()
     return wrapper

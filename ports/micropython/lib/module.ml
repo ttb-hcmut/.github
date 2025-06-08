@@ -1,11 +1,11 @@
 module Response = struct
-  type t = { return_value: int }
+  type t = { return_value: string }
   let make return_value = { return_value }
   let return_value t = t.return_value
   let jsont =
     let open Jsont in
     Object.map make
-    |> Object.mem "return_value" Jsont.int ~enc:return_value
+    |> Object.mem "return_value" Jsont.string ~enc:return_value
     |> Object.finish
 end
 
