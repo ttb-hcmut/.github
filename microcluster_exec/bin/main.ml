@@ -76,7 +76,7 @@ let main ~device command =
     seq |> Seq.fold_left begin fun _ ctx ->
       Fiber.fork ~sw @@ fun () ->
       Fs_socket.reply ctx @@ fun inp ->
-      Rpc.fold_left inp
+      Rpc.fold_left inp ~fs:(Stdenv.fs env) ~process_mgr
     end ()
     |> ignore
   );
