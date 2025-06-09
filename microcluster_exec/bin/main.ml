@@ -33,7 +33,7 @@ let main ~device command =
   let process_mgr = Stdenv.process_mgr env
   and with_report = with_report ~stderr:(Stdenv.stderr env)
   and vardir  = Path.(Stdenv.fs env / Sys.getenv "HOME" / ".var") in
-  let command = match command with Some x -> x | None -> failwith "command is none??" in
+  let command = match command with Some x -> x | None -> failwith "command is empty" in
   let session_name =
     Uuidm.v4_gen (Random.State.make_self_init ()) ()
     |> Uuidm.to_string in
@@ -41,32 +41,12 @@ let main ~device command =
     (Stdenv.process_mgr env)
     command session_name in
   ( with_report ~msg:(fun x -> "detected program language " ^ (Language.to_string x)) @@ fun () ->
-    let open Command in
-    command
-    |> fun c ->
-    Filename.extension c.program_file
-    |> Language.of_extension_opt
+    Detect_language.parse command ~cwd:(Stdenv.cwd env)
     |> function
-    | Some x -> x
-    | None   ->
-      c.program_file
-      |> Path.(/) (Stdenv.cwd env)
-      |> Path.load
-      |> Script.of_text
-      |> (fun x ->
-        let (let*) = Option.bind in
-        let* shebang = x.shebang in
-        match shebang with
-        | "/usr/bin/python" -> Some `LanguagePython
-        | "/usr/bin/ocaml"  -> Some `LanguageOCaml
-        | _                 -> None
-      ) 
-      |> Option.value ~default:`LanguagePython
-  )
-  |> function
-  | `LanguageOCaml  -> failwith "OCaml is not supported yet"
-  | `LanguagePython ->
-  let module Rpc = (val Controller_make.of_id "micropython": Controller.Rpc) in
+    | `LanguageOCaml  -> failwith "OCaml is not supported yet"
+    | `LanguagePython as x -> x
+  ) |> ignore;
+  let module Rpc = (val Controller_make.of_id "micropython" : Controller.Rpc) in
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
   Fs_socket.Namespace_watch.all ~process_mgr ~vardir ~ejsont:Rpc.Result.jsont ~fjsont:Rpc.Input.jsont ~session_name ~sw
