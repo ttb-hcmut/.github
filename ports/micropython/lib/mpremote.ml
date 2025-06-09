@@ -1,3 +1,5 @@
+let mutex = Eio.Mutex.create ()
+
 let copy ~from ~dest ~null =
   let open Scp_types in
   let from = file_to_string from
@@ -6,6 +8,7 @@ let copy ~from ~dest ~null =
   fun ~process_mgr ->
   Switch.run @@ fun sw ->
   let null = null ~sw in
+  Mutex.use_ro mutex @@ fun () ->
   Process.run process_mgr ~stdout:null
   [ "mpremote"
   ; "cp"
@@ -20,6 +23,7 @@ let run (file: remote_file) =
   let file = Fpath.to_string file in
   let open Eio in
   fun ~process_mgr ->
+  Mutex.use_ro mutex @@ fun () ->
   Process.parse_out
     process_mgr
     Eio.Buf_read.line
@@ -41,6 +45,7 @@ end
 module Commands = struct
   let run cmds ~process_mgr =
     let open Eio in
+    Mutex.use_ro mutex @@ fun () ->
     Process.run process_mgr
       begin
         [ "mpremote" ]
@@ -50,6 +55,7 @@ module Commands = struct
   let parse_out cmds ~process_mgr =
     let open Eio in
     try
+    Mutex.use_ro mutex @@ fun () ->
     Process.parse_out process_mgr Buf_read.line
       begin
         [ "mpremote" ]
