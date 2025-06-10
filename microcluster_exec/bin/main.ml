@@ -25,32 +25,41 @@ let with_report ~stderr ~domain ~msg f =
 
 let with_report = with_report ~domain:"microcluster_exec"
 
+module Option0 = struct
+  let unwrap ~error_msg x = match x with
+    | Some x -> x
+    | None   -> failwith error_msg
+end
+
 let main ~device command =
-  device |> ignore;
   let open Eio in
   Eio_main.run @@ fun env ->
-  (* let serial  = serial Path.(Stdenv.fs env / device) *)
-  let process_mgr = Stdenv.process_mgr env
-  and with_report = with_report ~stderr:(Stdenv.stderr env)
-  and vardir  = Path.(Stdenv.fs env / Sys.getenv "HOME" / ".var") in
-  let command = match command with Some x -> x | None -> failwith "command is empty" in
-  let session_name =
-    Uuidm.v4_gen (Random.State.make_self_init ()) ()
-    |> Uuidm.to_string in
-  let backend = backend
-    (Stdenv.process_mgr env)
-    command session_name in
+  let with_report = with_report ~stderr:(Stdenv.stderr env) in
+  let command = Option0.unwrap command ~error_msg:"command is empty" in
   ( with_report ~msg:(fun x -> "detected program language " ^ (Language.to_string x)) @@ fun () ->
     Detect_language.parse command ~cwd:(Stdenv.cwd env)
     |> function
     | `LanguageOCaml  -> failwith "OCaml is not supported yet"
     | `LanguagePython as x -> x
   ) |> ignore;
+  (* let serial  = serial Path.(Stdenv.fs env / device) *)
+  device |> ignore;
+  let process_mgr = Stdenv.process_mgr env
+  and vardir  = Path.(Stdenv.fs env / Sys.getenv "HOME" / ".var")
+  and session_name =
+    Uuidm.v4_gen (Random.State.make_self_init ()) ()
+    |> Uuidm.to_string in
+  let backend = backend
+    (Stdenv.process_mgr env)
+    command session_name in
   let module Rpc = (val Controller_make.of_id "micropython" : Controller.Rpc) in
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
-  Fs_socket.Namespace_watch.all ~process_mgr ~vardir ~ejsont:Rpc.Result.jsont ~fjsont:Rpc.Input.jsont ~session_name ~sw
-  |> function seq, stop_hosting ->
+  let seq, stop_hosting =
+    Fs_socket.Namespace_watch.all
+      ~process_mgr ~vardir
+      ~ejsont:Rpc.Result.jsont ~fjsont:Rpc.Input.jsont
+      ~session_name ~sw in
   ( Fiber.fork ~sw @@ fun () ->
     Switch.run @@ fun sw ->
     seq |> Seq.fold_left begin fun _ ctx ->
