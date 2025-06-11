@@ -23,7 +23,7 @@ def get_uclustr_env():
   uclustr_env = os.getenv("MICROCLUSTER_ENV")
   try:
     uclustr_env = json.loads(uclustr_env)
-  except json.decoder.JSONDecodeError:
+  except (json.decoder.JSONDecodeError, TypeError):
     return None
   try:
     session_name = uclustr_env["session_name"]
