@@ -1,0 +1,5 @@
+(library
+ (public_name microcluster_exec.log)
+ (kind ppx_rewriter)
+ (libraries ppxlib re)
+ (name log))

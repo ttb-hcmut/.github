@@ -2,4 +2,6 @@
  (public_name microcluster_exec)
  (name main)
  (flags -linkall)
+ (preprocess
+  (pps microcluster_exec.log))
  (libraries microcluster_exec controller_make jsont fs_socket eio eio_main cmdliner uuidm))

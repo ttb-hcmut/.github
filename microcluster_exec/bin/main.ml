@@ -32,11 +32,10 @@ module Option0 = struct
 end
 
 let main ~device command =
-  let open Eio in
+  let open Eio in 
   Eio_main.run @@ fun env ->
-  let with_report = with_report ~stderr:(Stdenv.stderr env) in
   let command = Option0.unwrap command ~error_msg:"command is empty" in
-  ( with_report ~msg:(fun x -> "detected program language " ^ (Language.to_string x)) @@ fun () ->
+  ( [%with_report {|detected program language {Language}|}] @@ fun () ->
     Detect_language.parse command ~cwd:(Stdenv.cwd env)
     |> function
     | `LanguageOCaml  -> failwith "OCaml is not supported yet"
