@@ -1,7 +1,7 @@
 open Microcluster_exec;;
 
 type 'a backend =
-  { process_mgr : 'a Eio.Process.mgr_ty Eio.Resource.t
+  { process_mgr : 'a Eio.Process.mgr
   ; command: Command.t
   ; session_name: string
   }

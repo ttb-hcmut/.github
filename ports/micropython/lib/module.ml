@@ -98,7 +98,7 @@ let fold_left =
   |> fun f -> f ()
   |> Response.make
 
-module Rpc : Controller.Rpc = struct
+module Rpc = struct
   module Input = Request
   module Result = Response
   let fold_left = fold_left
