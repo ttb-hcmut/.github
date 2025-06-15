@@ -10,13 +10,19 @@ module type Result = sig
   val jsont: t Jsont.t
 end
 
+type env =
+  < stderr      : [ `Flow | `Unix_fd | `W ] Eio.Resource.t
+  ; domain_name : string
+  ; process_mgr : [`Unix | `Generic] Eio.Process.mgr_ty Eio.Resource.t
+  ; fs          : Eio.Fs.dir_ty Eio.Path.t
+  >
+
 module type Rpc = sig
   module Input : Input
   module Result : Result
   val fold_left :
     Input.t ->
-    process_mgr: [`Unix | `Generic] Eio.Process.mgr_ty Eio.Resource.t ->
-    fs: Eio.Fs.dir_ty Eio.Path.t ->
+    env:env ->
     Result.t
 end
 

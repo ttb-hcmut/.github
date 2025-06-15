@@ -52,10 +52,16 @@ let remove_microcluster_canvas =
   fun s ->
   Re.replace ~all:true ~f:(fun _ -> "") pattern s
 
+module A = struct
+  let to_string x = x
+end
+
 let fold_left =
   let open Eio in
   let trn_cachemap = Hashtbl.create 10 in
-  fun request ~process_mgr:(process_mgr:[`Generic | `Unix] Eio.Process.mgr_ty Eio.Resource.t) ~fs ->
+  fun request ~env ->
+  let process_mgr = Stdenv.process_mgr env
+  and fs = Stdenv.fs env in
   let open Request in
   ( match Hashtbl.find trn_cachemap request.module_name with
   | cached_trn, ((), cached_funname) ->
@@ -64,7 +70,11 @@ let fold_left =
     Promise.await cached_trn
   | exception Not_found ->
     let cache, resolve_cache = Promise.create () in
-    Hashtbl.add trn_cachemap request.module_name (cache, ((), request.function_name));
+    [%with_report "detected task {A}"]
+    begin fun () ->
+      Hashtbl.add trn_cachemap request.module_name (cache, ((), request.function_name));
+      request.module_name
+    end |> ignore;
     inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
       begin fun file ->
         let text = 

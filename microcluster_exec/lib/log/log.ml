@@ -38,10 +38,8 @@ let expand ~ctxt =
   |> function path, serializer ->
   ast#pexp_apply
     (ast#evar "Log_domain.with_report")
-    [ Labelled "stderr",
-      (ast#pexp_apply
-        (ast#evar "Eio.Stdenv.stderr")
-        [Nolabel, ast#evar "env"])
+    [ Labelled "env",
+      (ast#evar "env")
     ; Labelled "msg",
       (ast#pexp_fun
         Nolabel None

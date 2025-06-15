@@ -1,4 +1,5 @@
 (library
  (public_name microcluster-micropython)
- (libraries re fpath jsont eio microcluster_exec.controller)
+ (preprocess (pps microcluster_exec.log))
+ (libraries re fpath jsont eio microcluster_exec.controller microcluster_exec.log_domain)
  (name module))

@@ -18,24 +18,24 @@ let backend_run ~backend =
 (* type serial = { path : Eio.Fs.dir_ty Eio.Resource.t * string } *)
 (* let serial path = { path } *)
 
-let domain_name = "microcluster_exec"
-
-let with_report ~stderr ~domain ~msg f =
-  let value = f () in
-  Eio.Flow.copy_string (domain ^ ": " ^ (msg value) ^ "\n") stderr;
-  value
-
-let with_report = with_report ~domain:domain_name
-
 module Option0 = struct
   let unwrap ~error_msg x = match x with
     | Some x -> x
     | None   -> failwith error_msg
 end
 
+let domain_name = "microcluster_exec"
+
 let main ~device command =
   let open Eio in 
   Eio_main.run @@ fun env ->
+  let env = object
+    method stderr = Stdenv.stderr env
+    method cwd    = Stdenv.cwd env
+    method fs     = Stdenv.fs env
+    method process_mgr = Stdenv.process_mgr env
+    method domain_name = domain_name
+  end in
   let command = Option0.unwrap command ~error_msg:"command is empty" in
   ( [%with_report {|detected program language {Language}|}] @@ fun () ->
     Detect_language.parse command ~cwd:(Stdenv.cwd env)
@@ -66,7 +66,7 @@ let main ~device command =
     seq |> Seq.fold_left begin fun _ ctx ->
       Fiber.fork ~sw @@ fun () ->
       Fs_socket.reply ctx @@ fun inp ->
-      Rpc.fold_left inp ~fs:(Stdenv.fs env) ~process_mgr
+      Rpc.fold_left inp ~env:(env :> Controller.env)
     end ()
     |> ignore
   );

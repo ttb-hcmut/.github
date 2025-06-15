@@ -4,8 +4,9 @@
 
 - [ ] Migrate logic from microcluster_canvas to microcluster_exec. Code as data
 - [ ] ensure colorful output, like nix
-- [ ] object type for capability-passing
-- [ ] logging for external module (domain_err), log for ports/micropython, object type deriving
+- [x] object type for capability-passing
+- [x] logging for external module (domain_err), log for ports/micropython
+- [ ] object type deriving (so `Controller.env` can derive from `Log_domain.domain_err`)
 - [x] ppx-based logging
 - [ ] linear regression example
 - [ ] (cont. of Dynlink) dynamic module system
