@@ -18,12 +18,14 @@ let backend_run ~backend =
 (* type serial = { path : Eio.Fs.dir_ty Eio.Resource.t * string } *)
 (* let serial path = { path } *)
 
+let domain_name = "microcluster_exec"
+
 let with_report ~stderr ~domain ~msg f =
   let value = f () in
   Eio.Flow.copy_string (domain ^ ": " ^ (msg value) ^ "\n") stderr;
   value
 
-let with_report = with_report ~domain:"microcluster_exec"
+let with_report = with_report ~domain:domain_name
 
 module Option0 = struct
   let unwrap ~error_msg x = match x with
@@ -77,7 +79,7 @@ let main ~device command =
 let main =
   let open Cmdliner in
   Cmd.v
-  ( Cmd.info "microcluster_exec"
+  ( Cmd.info domain_name
     ~doc:{|A Python / OCaml interpreter that dissects your program and orchestrates distributable tasks to a micro-cluster.|}
   ) @@
   let open Term.Syntax in
