@@ -7,7 +7,7 @@
 - [x] when passing capabilities [^capability] to external functions, use object type
 - [x] logging for external module (domain_err), log for ports/micropython
 - [ ] new deriving-like macro to derive from/for object type (so `Controller.env` can derive from `Log_domain.domain_err`)
-- [ ] new deriving macro [^deriving]: jsont / json serializable
+- [x] new deriving macro [^deriving]: jsont / json serializable
 - [x] ppx-based logging
 - [ ] (cont. of Dynlink) dynamic module system
 - [ ] install ComplexArts/micropython-numpy

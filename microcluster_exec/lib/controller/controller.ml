@@ -1,13 +1,9 @@
-(* TODO: deriving serializable *)
-
 module type Input = sig
-  type t
-  val jsont: t Jsont.t
+  type t [@@deriving json]
 end
 
 module type Result = sig
-  type t
-  val jsont: t Jsont.t
+  type t [@@deriving json]
 end
 
 type env =
