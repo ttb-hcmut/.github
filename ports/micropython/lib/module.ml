@@ -29,16 +29,19 @@ module Request = struct
     |> Object.finish
 end
 
-let inplace_transform_file ~fs ~process_mgr file f =
+let mktemp ~fs ~process_mgr f =
   let open Eio in
   Process.parse_out process_mgr Buf_read.line ["mktemp"]
-  |> fun s -> Path.(fs / s)
-  |> fun tmpfile ->
-  begin
-    Path.load file
-    |> Path.save ~create:`Never tmpfile
-  end;
-  f tmpfile
+  |> Path.(/) fs
+  |> f
+
+let inplace_transform_file ~fs ~process_mgr file f =
+  let open Eio in
+  mktemp ~fs ~process_mgr @@ fun tmpfile ->
+  Path.load file
+  |> f
+  |> Path.save ~create:`Never tmpfile;
+  tmpfile
 
 let remove_microcluster_canvas =
   let pattern =
@@ -72,17 +75,10 @@ let fold_left =
     [%report0 "detected task {module_name}"];
     Hashtbl.add trn_cachemap module_name (cache, ((), request.function_name));
     inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
-      begin fun file ->
-        let text = 
-          file
-          |> Path.load in
-        let text =
-          text
-          |> String.split_on_char '\n'
-          |> List.map remove_microcluster_canvas
-          |> String.concat "\n" in
-        Path.save ~create:(`Or_truncate 0x600) file text;
-        file
+      begin fun text -> text
+        |> String.split_on_char '\n'
+        |> List.map remove_microcluster_canvas
+        |> String.concat "\n"
       end
     |> fun file ->
     Mpremote.copy ~process_mgr ~null:(fun ~sw -> Path.open_out ~create:`Never ~sw Path.(fs / "/dev/null"))
