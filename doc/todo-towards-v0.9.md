@@ -3,7 +3,7 @@
 > Working prototype (without the design icks)
 
 - [ ] Migrate logic from microcluster_canvas to microcluster_exec. Code as data
-- [ ] ensure colorful output, like nix
+- [ ] ensure colorful output, like nix (highlight names, separation between semantic and symbolic markup, modify cmdliner?)
 - [x] object type for capability-passing
 - [x] logging for external module (domain_err), log for ports/micropython
 - [ ] object type deriving (so `Controller.env` can derive from `Log_domain.domain_err`)
