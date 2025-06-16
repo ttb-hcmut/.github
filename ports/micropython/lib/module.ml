@@ -69,12 +69,10 @@ let fold_left =
     then failwith {|each module must have only ONE function export|};
     Promise.await cached_trn
   | exception Not_found ->
-    let cache, resolve_cache = Promise.create () in
-    [%with_report "detected task {A}"]
-    begin fun () ->
-      Hashtbl.add trn_cachemap request.module_name (cache, ((), request.function_name));
-      request.module_name
-    end |> ignore;
+    let cache, resolve_cache = Promise.create ()
+    and { module_name; _ }   = request in
+    [%report0 "detected task {module_name}"];
+    Hashtbl.add trn_cachemap module_name (cache, ((), request.function_name));
     inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
       begin fun file ->
         let text = 

@@ -52,6 +52,25 @@ let expand ~ctxt =
               (ast#evar (serializer ^ ".to_string"))
               [Nolabel, ast#evar "x"])]))]
 
+let expand_report0 ~ctxt =
+  let loc = Expansion_context.Extension.extension_point_loc ctxt in
+  let ast = new ast_builder loc in
+  function path ->
+  subs path
+  |> function path, serializer ->
+  ast#pexp_apply
+    (ast#evar "Log_domain.report0")
+    [ Labelled "env",
+      (ast#evar "env")
+    ; Labelled "msg",
+      (ast#pexp_apply
+        ( ast#evar "Printf.sprintf")
+          [ Nolabel, (ast#estring path)
+          ; Nolabel,
+            (ast#evar serializer)
+          ] )
+    ]
+
 let () =
   Extension.V3.declare
     "with_report"
@@ -62,3 +81,14 @@ let () =
   |> fun rule ->
   Driver.register_transformation
     ~rules:[ rule ] "with_report"
+
+let () =
+  Extension.V3.declare
+    "report0"
+    Extension.Context.expression
+    Ast_pattern.(single_expr_payload (estring __))
+    expand_report0
+  |> Ppxlib.Context_free.Rule.extension
+  |> fun rule ->
+  Driver.register_transformation
+    ~rules:[ rule ] "report0"
