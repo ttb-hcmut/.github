@@ -30,9 +30,9 @@ let main ~device command =
   let open Eio in 
   Eio_main.run @@ fun env ->
   let env = object
-    method stderr = Stdenv.stderr env
-    method cwd    = Stdenv.cwd env
-    method fs     = Stdenv.fs env
+    method stderr  = Stdenv.stderr env
+    method cwd     = Stdenv.cwd env
+    method fs      = Stdenv.fs env
     method process_mgr = Stdenv.process_mgr env
     method domain_name = domain_name
   end in
