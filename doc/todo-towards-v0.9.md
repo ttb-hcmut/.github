@@ -3,17 +3,18 @@
 > Working prototype (without the design icks)
 
 - [ ] Migrate logic from microcluster_canvas to microcluster_exec. Code as data
-- [ ] ensure colorful output, like nix
-- [x] object type for capability-passing
+- [ ] ensure colorful output, like nix (highlight names, separation between semantic and symbolic markup, modify cmdliner?)
+- [x] when passing capabilities [^capability] to external functions, use object type
 - [x] logging for external module (domain_err), log for ports/micropython
-- [ ] object type deriving (so `Controller.env` can derive from `Log_domain.domain_err`)
-- [ ] jsont serializable deriving
+- [ ] new deriving-like macro to derive from/for object type (so `Controller.env` can derive from `Log_domain.domain_err`)
+- [ ] new deriving macro [^deriving]: jsont / json serializable
 - [x] ppx-based logging
 - [ ] (cont. of Dynlink) dynamic module system
 - [ ] install ComplexArts/micropython-numpy
-- [ ] manip code by ast
-- [ ] cancel mutex of mpremote
+- [ ] manip code by ast (`remove_microcluster_canvas`)
+- [ ] when backend ends (due to exception), cancel mutex of mpremote
 - [ ] passing argument RPC
+- [ ] script to build and install mpy modules
 
 Functional changes:
 - [ ] option to choose rpc controller
@@ -26,3 +27,7 @@ Documentation
 - [ ] Activity diagram for fs_socket
 - [ ] A motion canvas video illustrates the pipeline
 - [ ] A typst cetz paper illustrates the pipeline, activity diagram
+
+[^capability]: Capabilities, or lambda capabilities, is a design pattern of OCaml Eio, the IO / concurrency library that we use; you can read more [here](https://github.com/ocaml-multicore/eio#design-note-capabilities).
+
+[^deriving]: A deriver is a type of macro in functional languages that allows you to inherit features through preprocessing / compile-time processing (because inheritance is not natively supported). In OCaml, derivers are implemented using the `Ppxlib.Deriving` module; you can read more [here](https://ocaml-ppx.github.io/ppxlib/ppxlib/Ppxlib/Deriving/index.html).
