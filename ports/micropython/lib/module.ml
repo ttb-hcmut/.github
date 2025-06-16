@@ -49,12 +49,10 @@ let remove_microcluster_canvas =
     ; any |> rep
     ]
     |> compile in
-  fun s ->
-  Re.replace ~all:true ~f:(fun _ -> "") pattern s
-
-module A = struct
-  let to_string x = x
-end
+  Re.replace
+    ~all:true
+    ~f:(fun _ -> "")
+    pattern
 
 let fold_left =
   let open Eio in
@@ -88,10 +86,9 @@ let fold_left =
       end
     |> fun file ->
     Mpremote.copy ~process_mgr ~null:(fun ~sw -> Path.open_out ~create:`Never ~sw Path.(fs / "/dev/null"))
-      ~from:(`local begin
-        Fpath.of_string (Path.native_exn file)
-        |> Result.get_ok
-      end)
+      ~from:
+        (`local
+          (Fpath.v (Path.native_exn file)))
       ~dest:(`remote (`mpy, Fpath.(v (request.module_name ^ ".py") )))
     ;
     let conn () =
