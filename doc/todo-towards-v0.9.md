@@ -7,8 +7,8 @@
 - [x] object type for capability-passing
 - [x] logging for external module (domain_err), log for ports/micropython
 - [ ] object type deriving (so `Controller.env` can derive from `Log_domain.domain_err`)
+- [ ] jsont serializable deriving
 - [x] ppx-based logging
-- [ ] linear regression example
 - [ ] (cont. of Dynlink) dynamic module system
 - [ ] install ComplexArts/micropython-numpy
 - [ ] manip code by ast
@@ -16,11 +16,12 @@
 - [ ] passing argument RPC
 
 Functional changes:
-- [ ] infer RPC controller from serial port
+- [ ] option to choose rpc controller
 - [ ] error message from mpy execution, propagate remote exception to mainland
 - [ ] verbose mode toggle
 
 Documentation
+- [ ] linear regression example
 - [ ] Document modules and functions
 - [ ] Activity diagram for fs_socket
 - [ ] A motion canvas video illustrates the pipeline

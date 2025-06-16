@@ -1,1 +1,2 @@
 - [ ] New method to concurrently RPC with micropython (`mpremote mount`?)
+- [ ] infer RPC controller from serial port

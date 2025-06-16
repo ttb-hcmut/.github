@@ -8,4 +8,4 @@ A suite of tools to distribute your programs to a cluster of micro-controllers, 
 
 [Filesystem Socket](./fs_socket) is a session-based IPC protocol, implemented as a socket library, used by programs in this project. It has binding for Python and OCaml, for client and server-side.
 
-[Ports](./ports) contains drivers for specific microcontrollers and devices.
+[Ports](./ports) contains drivers for specific microcontrollers and devices, to be loaded by Micro-cluster Execute.
