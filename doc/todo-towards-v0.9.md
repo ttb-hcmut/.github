@@ -18,7 +18,7 @@
 Functional changes:
 - [ ] option to choose rpc controller
 - [ ] error message from mpy execution, propagate remote exception to mainland
-- [ ] verbose mode toggle
+- [x] verbose mode toggle
 
 Documentation
 - [ ] linear regression example

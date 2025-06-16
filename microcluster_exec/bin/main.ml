@@ -26,11 +26,12 @@ end
 
 let domain_name = "microcluster_exec"
 
-let main ~device command =
+let main ~device ~verbose command =
   let open Eio in 
   Eio_main.run @@ fun env ->
   let env = object
     method stderr  = Stdenv.stderr env
+    method verbose = verbose
     method cwd     = Stdenv.cwd env
     method fs      = Stdenv.fs env
     method process_mgr = Stdenv.process_mgr env
@@ -63,6 +64,7 @@ let main ~device command =
       ~session_name ~sw in
   ( Fiber.fork ~sw @@ fun () ->
     let env = (object
+      method verbose = verbose
       method stderr  = Stdenv.stderr env
       method fs      = Stdenv.fs env
       method domain_name = env#domain_name
@@ -105,9 +107,16 @@ let main =
       ~doc:{|Command for executing the program script.|}
       ~docv:"COMMAND"
     )
-  in
+  and+ verbose =
+    Arg.
+    ( value
+    & flag
+    & info ["verbose"]
+      ~doc:{|Increases the level of verbosity of diagnostic messages printed on standard error.|}
+      ~docv:"VERBOSE"
+    ) in
   let command = Command.parse_opt command in
-  main ~device command
+  main ~device ~verbose command
 
 let () =
   if !Sys.interactive then () else
