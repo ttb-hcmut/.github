@@ -14,6 +14,7 @@
 - [ ] manip code by ast
 - [ ] cancel mutex of mpremote
 - [ ] passing argument RPC
+- [ ] script to build and install mpy modules
 
 Functional changes:
 - [ ] option to choose rpc controller
