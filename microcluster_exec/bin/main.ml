@@ -62,11 +62,17 @@ let main ~device command =
       ~ejsont:Rpc.Result.jsont ~fjsont:Rpc.Input.jsont
       ~session_name ~sw in
   ( Fiber.fork ~sw @@ fun () ->
+    let env = (object
+      method stderr  = Stdenv.stderr env
+      method fs      = Stdenv.fs env
+      method domain_name = env#domain_name
+      method process_mgr = Stdenv.process_mgr env
+    end :> Controller.env) in
     Switch.run @@ fun sw ->
     seq |> Seq.fold_left begin fun _ ctx ->
       Fiber.fork ~sw @@ fun () ->
       Fs_socket.reply ctx @@ fun inp ->
-      Rpc.fold_left inp ~env:(env :> Controller.env)
+      Rpc.fold_left inp ~env
     end ()
     |> ignore
   );
