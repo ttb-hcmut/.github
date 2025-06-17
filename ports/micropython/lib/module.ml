@@ -43,19 +43,57 @@ let inplace_transform_file ~fs ~process_mgr file f =
   |> Path.save ~create:`Never tmpfile;
   tmpfile
 
-let remove_microcluster_canvas =
-  let pattern =
-    let open Re in
-    seq
-    [ any |> rep
-    ; alt [ str "parallel"; str "microcluster_canvas" ]
-    ; any |> rep
-    ]
-    |> compile in
-  Re.replace
-    ~all:true
-    ~f:(fun _ -> "")
-    pattern
+let result_with_ok ~fail f =
+  match f () with
+  | Result.Ok x -> x
+  | Result.Error k -> fail k
+
+let remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
+  let open PyreAst.Concrete in
+  let body = ast.body |> List.fold_left (fun acc x -> match x with
+    | Statement.ImportFrom { names; location; module_ = Some module_; level } when String.equal (Identifier.to_string module_) "microcluster_canvas" ->
+      let names = names |> List.filter (
+        let open ImportAlias in
+        function
+        | { name; _ } when String.equal (Identifier.to_string name) "parallel" -> false
+        | _ -> true
+      ) in
+      ( match names with
+      | [] -> acc
+      | _ ->
+        let x = Statement.make_importfrom_of_t ~location ~names ~module_ ~level () in
+        x :: acc
+      )
+    | Statement.Import { names; location } ->
+      let names = names |> List.filter (
+        let open ImportAlias in
+        function
+        | { name; _ } when String.equal (Identifier.to_string name) "microcluster_canvas" -> false
+        | _ -> true
+      ) in
+      ( match names with
+      | [] -> acc
+      | _ ->
+        let x = Statement.make_import_of_t ~location ~names () in
+        x :: acc
+      )
+    | Statement.AsyncFunctionDef { decorator_list; location; name; args; body; returns; type_comment; type_params } ->
+      let decorator_list = decorator_list |> List.filter (
+        (* this decorator expression must be fully evaluated so that we know its absolute id. For name, match name *)
+        function
+        | Expression.Call { func = Expression.Name { id; _ }; _ } when String.equal (Identifier.to_string id) "parallel" -> false
+        | Expression.Call { func = Attribute { value = Expression.Name { id = receiver; _ }; attr = id ; _ }; _ } when String.equal (Identifier.to_string receiver) "microcluster_canvas" && String.equal (Identifier.to_string id) "parallel" -> false
+        | _ -> true
+      ) in
+      let x = Statement.make_asyncfunctiondef_of_t ~decorator_list ~location ~name ~args ~body ?returns ?type_comment ~type_params () in
+      x :: acc
+    | _ -> x :: acc
+  ) []
+  and type_ignores = ast.type_ignores
+  in
+  let body = List.rev body in
+  Module.make_t ~body ~type_ignores ()
+  |> Result.ok
 
 let fold_left =
   let open Eio in
@@ -75,10 +113,23 @@ let fold_left =
     [%report0 "detected task {module_name}"];
     Hashtbl.add trn_cachemap module_name (cache, ((), request.function_name));
     inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
-      begin fun text -> text
-        |> String.split_on_char '\n'
-        |> List.map remove_microcluster_canvas
-        |> String.concat "\n"
+      begin fun text ->
+        let ( >>= ) = Result.bind in
+        let open PyreAst.Parser in
+        with_context @@ fun context ->
+        result_with_ok ~fail:(function
+          | { Error.message ; line ; column ; _ } ->
+            let message =
+              Printf.sprintf "Python parsing error at line %d, column %d: %s"
+                line column message in
+            failwith message
+        ) @@ fun () ->
+        Concrete.parse_module ~context text
+        >>= remove_microcluster_canvas
+        >>= fun ast ->
+        let open Opine in
+        Buffer.contents (Unparse.py_module (Unparse.State.default ()) ast).source
+        |> Result.ok
       end
     |> fun file ->
     Mpremote.copy ~process_mgr ~null:(fun ~sw -> Path.open_out ~create:`Never ~sw Path.(fs / "/dev/null"))

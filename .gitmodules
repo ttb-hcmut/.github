@@ -1,0 +1,3 @@
+[submodule "opine"]
+	path = opine
+	url = git@github.com:ttb-microcluster/opine

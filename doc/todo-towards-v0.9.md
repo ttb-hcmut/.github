@@ -11,7 +11,7 @@
 - [x] ppx-based logging
 - [ ] (cont. of Dynlink) dynamic module system
 - [ ] install ComplexArts/micropython-numpy
-- [ ] manip code by ast (`remove_microcluster_canvas`)
+- [x] manip code by ast (`remove_microcluster_canvas`)
 - [ ] when backend ends (due to exception), cancel mutex of mpremote
 - [ ] passing argument RPC
 - [ ] script to build and install mpy modules
