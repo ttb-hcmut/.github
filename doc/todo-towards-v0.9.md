@@ -14,7 +14,7 @@
 - [x] manip code by ast (`remove_microcluster_canvas`)
 - [ ] when backend ends (due to exception), cancel mutex of mpremote
 - [ ] passing argument RPC
-- [ ] script to build and install mpy modules
+- [ ] platformio script to build and install mpy modules
 
 Functional changes:
 - [ ] option to choose rpc controller
