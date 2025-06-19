@@ -1,3 +1,0 @@
-(library
- (libraries fpath pyre-ast opine dynlink microcluster_exec.controller eio)
- (name controller_make))

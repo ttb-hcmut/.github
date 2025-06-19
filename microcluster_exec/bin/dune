@@ -4,4 +4,4 @@
  (flags -linkall)
  (preprocess
   (pps microcluster_exec.log))
- (libraries microcluster_exec controller_make jsont fs_socket eio eio_main cmdliner uuidm microcluster_exec.log_domain))
+ (libraries microcluster_exec jsont fs_socket eio eio_main cmdliner uuidm microcluster_exec.log_domain))
