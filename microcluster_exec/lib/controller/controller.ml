@@ -12,6 +12,7 @@ type env =
   ; verbose     : bool
   ; process_mgr : [`Unix | `Generic] Eio.Process.mgr_ty Eio.Resource.t
   ; fs          : Eio.Fs.dir_ty Eio.Path.t
+  ; err         : Eio_format.formatter option
   >
 
 module type Rpc = sig

@@ -1,3 +1,3 @@
 (library
- (libraries re eio controller fpath pyre-ast opine dynlink)
+ (libraries re eio controller fpath pyre-ast opine dynlink eio_format microcluster_exec.styled_format)
  (name microcluster_exec))

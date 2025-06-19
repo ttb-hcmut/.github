@@ -36,9 +36,10 @@ let main ~device ~verbose command =
     method fs      = Stdenv.fs env
     method process_mgr = Stdenv.process_mgr env
     method domain_name = domain_name
+    method err = Some (Format.eio__err_formatter env ())
   end in
   let command = Option0.unwrap command ~error_msg:"command is empty" in
-  ( [%with_report {|detected program language {Language}|}] @@ fun () ->
+  ( [%with_report {|detected program language <enum>{Language}</enum>|}] @@ fun () ->
     Detect_language.parse command ~cwd:(Stdenv.cwd env)
     |> function
     | `LanguageOCaml  -> failwith "OCaml is not supported yet"
@@ -69,6 +70,7 @@ let main ~device ~verbose command =
       method fs      = Stdenv.fs env
       method domain_name = env#domain_name
       method process_mgr = Stdenv.process_mgr env
+      method err = env#err
     end :> Controller.env) in
     Switch.run @@ fun sw ->
     seq |> Seq.fold_left begin fun _ ctx ->
@@ -120,4 +122,10 @@ let main =
 
 let () =
   if !Sys.interactive then () else
-  Cmdliner.Cmd.eval main |> exit
+  Cmdliner.Cmd.eval
+    ~err:
+    ( let open Styled_format.Syntax in
+      Format.err_formatter
+      <. Format.cmdliner__err_formatter )
+    main
+  |> exit

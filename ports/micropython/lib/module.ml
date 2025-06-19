@@ -110,7 +110,7 @@ let fold_left =
   | exception Not_found ->
     let cache, resolve_cache = Promise.create ()
     and { module_name; _ }   = request in
-    [%report0 "detected task {module_name}"];
+    [%report0 "detected task <name>{module_name}</name>"];
     Hashtbl.add trn_cachemap module_name (cache, ((), request.function_name));
     inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
       begin fun text ->
