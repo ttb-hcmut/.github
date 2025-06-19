@@ -23,7 +23,7 @@ Functional changes:
 
 Documentation
 - [ ] linear regression example
-- [ ] Document modules and functions (format, eio_format, styled_format)
+- [ ] Document modules and functions (format, eio_format)
 - [ ] Activity diagram for fs_socket
 - [ ] A motion canvas video illustrates the pipeline
 - [ ] A typst cetz paper illustrates the pipeline, activity diagram

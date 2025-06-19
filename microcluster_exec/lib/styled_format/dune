@@ -1,4 +1,0 @@
-(library
- (libraries re)
- (public_name microcluster_exec.styled_format)
- (name styled_format))
