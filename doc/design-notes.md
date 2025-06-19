@@ -3,9 +3,7 @@
 In XXXX, we introduced formatters, a preprocessing stage to add colors to stderr output.
 
 1. We use formatters that can be combined.
-
 2. We use formatters that can be one-way combined by extending with additional rules (legacy)
-
 3. We use the same formatter for all cases (current)
 
 Exibit 1 is ideal. However, there's currently no formatter implementation in the OCaml ecosystem that allows combination [^redirect].
