@@ -1,3 +1,4 @@
 - [ ] New method to concurrently RPC with micropython (`mpremote mount`? micropython promise-based eval?)
 - [ ] infer RPC controller from serial port
 - [ ] tests for microcluster_exec
+- [ ] build system for python: migrate from hatchling to uv
