@@ -16,7 +16,11 @@ class FunctionTask():
     return json.dumps(self.to_dict())
 
   def to_dict(self):
-    info = { 'module_name': self.func.__module__, 'function_name': self.func.__name__, 'actual_arguments': self.args, 'cwd': os.getcwd() }
+    info = {
+      'module_name': self.func.__module__,
+      'function_name': self.func.__name__,
+      'actual_arguments': self.args, 'cwd': os.getcwd()
+    }
     return info
 
 def get_uclustr_env():
