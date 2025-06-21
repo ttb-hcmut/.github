@@ -7,10 +7,13 @@ type 'a backend =
 
 let backend process_mgr command = { process_mgr; command }
 
-type ('a, 'b) callback = [ `Promise of string * 'a ] -> 'b Clientside.program
+type ('arg1, 'ret) callback1 = [ `Promise of string * 'arg1 ] -> 'ret Clientside.program
 
-type 'imp intercept = ([ `Object ], ('imp, [ `Unknown ]) Clientside.abstract_value) callback
-[@@alert experimental "The clientside interceptor pattern being evaluated."]
+type 'a intercept = ([ `Object ], ('a, [ `Unknown ]) Clientside.abstract_value) callback1
+(** A callback [f = fun self -> ...] is an [_ intercept] which is a callback
+    definition that will be executed in the remote runtime. *)
+[@@alert experimental
+  "The clientside interceptor pattern is being evaluated."]
 
 let backend_run ~backend =
   fun (interceptor: _ intercept) ->
