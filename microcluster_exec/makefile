@@ -13,5 +13,8 @@ install:
 test:
 	dune test
 
+doc:
+	dune build @doc
+
 clean:
 	dune clean
