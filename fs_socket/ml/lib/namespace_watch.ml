@@ -11,6 +11,13 @@ module Path0 = struct
     Process.run process_mgr ["sh"; "-c"; "echo '" ^ str ^ "' > " ^ (Path.native_exn path)]
 end
 
+module Result0 = struct
+  open Result
+  let get_ok = function
+    | Ok x -> x
+    | Error s -> failwith s
+end
+
 module type Serializable = sig
   type t
   val jsont: t Jsont.t
@@ -42,7 +49,7 @@ let all ~process_mgr ~ejsont ~fjsont ~vardir ~session_name ~sw =
             begin fun socket ->
               Flow.read_all socket
               |> Jsont_bytesrw.decode_string fjsont
-              |> Result.get_ok
+              |> Result0.get_ok
             end
           |> fun request ->
           let reply_v, r_promise_v = Promise.create () in
@@ -50,7 +57,7 @@ let all ~process_mgr ~ejsont ~fjsont ~vardir ~session_name ~sw =
           begin
             Promise.await reply_v
             |> Jsont_bytesrw.encode_string ejsont
-            |> Result.get_ok
+            |> Result0.get_ok
             |> fun reply_str ->
             (** @fixme(kinten) This code should have been [Eio.Flow.copy_string reply_str socket]. But it didn't work with unix pipe for some reasons. The expected behavior is that (and this is implemened by the OS) it should wait for the other side to establish connection, then writing starts - this is pipe synchronization, and is expected in unix. However, this behavior doesn't apply when using [Eio.Flow.copy_string], the bytes were quietly dropped before pipe connection. Now I have to use a placeholder solution [Path0.save ~process_mgr socket reply_str], I have to shell-out and send data with an echo command; it works, but it's obviously bad and stupid *)
             Path0.save ~process_mgr socket reply_str;
