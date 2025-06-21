@@ -23,10 +23,11 @@ Functional changes:
 
 Documentation
 - [ ] linear regression example
-- [ ] Document modules and functions (format, eio_format, clientside)
-- [ ] Activity diagram for fs_socket
-- [ ] A motion canvas video illustrates the pipeline
-- [ ] A typst cetz paper illustrates the pipeline, activity diagram
+- [ ] document modules and functions (format, eio_format, clientside)
+- [ ] a typst cetz paper: sequence diagram for fs_socket client/servers
+- [ ] a motion canvas video illustrates the pipeline
+- [ ] a typst cetz paper: ports/micropython program processing pipeline
+- [ ] a typst cetz paper: activity diagram for microcluster_exec frontend/backend fibers
 
 [^capability]: Capabilities, or lambda capabilities, is a design pattern of OCaml Eio, the IO / concurrency library that we use; you can read more [here](https://github.com/ocaml-multicore/eio#design-note-capabilities).
 
