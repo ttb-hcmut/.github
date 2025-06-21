@@ -6,6 +6,17 @@ import inspect
 import os
 import uuid
 
+class RIOCServer():
+  """remote inversion-of-control server"""
+  async def eval(self, program, *args, vars={}):
+    k = None
+    for x in program:
+      k = eval(x['rhs'], locals=vars)
+      if x['rhs_type'] == 'await':
+        k = await k
+      vars[x['lhs']] = k
+    return k
+
 class FunctionTask():
   def __init__(self, func, args):
     self.func = func
@@ -29,25 +40,20 @@ def get_uclustr_env():
     uclustr_env = json.loads(uclustr_env)
   except (json.decoder.JSONDecodeError, TypeError):
     return None
-  try:
-    session_name = uclustr_env["session_name"]
-  except KeyError:
-    return None
   return uclustr_env
 
-env = get_uclustr_env()
+program = get_uclustr_env()
+stm = RIOCServer()
 
 def _parallel_decorator_factory(*arg):
   def parallel(func):
     def wrapper(*args, **kwargs):
-      if env is None:
+      if program is None:
         return func(*args, **kwargs)
       task = FunctionTask(func, { 'args': args, 'kwargs': kwargs })
-      async def work():
-        reply = await fs_socket.comm(env['session_name'], task.name, task.to_dict())
-        retval = ast.literal_eval(reply['return_value'])
-        return retval
-      return work()
+      vars = {}
+      vars['task'] = task
+      return stm.eval(program, vars=vars)
     return wrapper
   return parallel
 

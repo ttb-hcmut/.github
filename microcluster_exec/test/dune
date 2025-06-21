@@ -1,2 +1,6 @@
 (test
  (name test_microcluster_exec))
+
+(test
+ (libraries alcotest microcluster_exec microcluster_exec.clientside microcluster_exec.clientside_jsont)
+ (name test_clientside))

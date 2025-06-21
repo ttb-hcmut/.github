@@ -2,7 +2,7 @@
 
 > Working prototype (without the design icks)
 
-- [ ] Migrate logic from microcluster_canvas to microcluster_exec. Code as data
+- [x] Migrate logic from microcluster_canvas to microcluster_exec. Code as data
 - [x] ensure colorful output, like nix (highlight names, separation between semantic and symbolic markup, modify cmdliner's err formatter?)
 - [x] when passing capabilities [^capability] to external functions, use object type
 - [x] logging for external module (domain_err), log for ports/micropython
@@ -23,7 +23,7 @@ Functional changes:
 
 Documentation
 - [ ] linear regression example
-- [ ] Document modules and functions (format, eio_format)
+- [ ] Document modules and functions (format, eio_format, clientside)
 - [ ] Activity diagram for fs_socket
 - [ ] A motion canvas video illustrates the pipeline
 - [ ] A typst cetz paper illustrates the pipeline, activity diagram

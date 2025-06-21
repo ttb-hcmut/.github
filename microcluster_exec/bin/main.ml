@@ -3,17 +3,30 @@ open Microcluster_exec;;
 type 'a backend =
   { process_mgr : 'a Eio.Process.mgr
   ; command: Command.t
-  ; session_name: string
   }
-let backend process_mgr command session_name = { process_mgr; command; session_name }
+
+let backend process_mgr command = { process_mgr; command }
+
+type ('a, 'b) callback = [ `Promise of string * 'a ] -> 'b Clientside.program
+
+type 'imp intercept = ([ `Object ], ('imp, [ `Unknown ]) Clientside.abstract_value) callback
+[@@alert experimental "The clientside interceptor pattern being evaluated."]
 
 let backend_run ~backend =
+  fun (interceptor: _ intercept) ->
   let env =
     Unix.environment ()
     |> Array.append
-      [| Printf.sprintf {|MICROCLUSTER_ENV={ "session_name": "%s" }|} backend.session_name |]
-    in
-  Eio.Process.run backend.process_mgr ~env (Command.unparse backend.command)
+      [| Printf.sprintf
+          {|MICROCLUSTER_ENV=%s|}
+          begin
+            let open Clientside_jsont in
+            interceptor (`Promise ("task", `Object))
+            |> encode_string
+          end
+      |] in
+  Eio.Process.run backend.process_mgr ~env
+    (Command.unparse backend.command)
 
 (* type serial = { path : Eio.Fs.dir_ty Eio.Resource.t * string } *)
 (* let serial path = { path } *)
@@ -54,7 +67,7 @@ let main ~device ~verbose command =
     |> Uuidm.to_string in
   let backend = backend
     (Stdenv.process_mgr env)
-    command session_name in
+    command in
   let module Rpc = (val Controller_make.of_id "micropython" : Controller.Rpc) in
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
@@ -81,7 +94,17 @@ let main ~device ~verbose command =
     |> ignore
   );
   ( Fiber.fork ~sw @@ fun () ->
-    backend_run ~backend;
+    backend_run ~backend begin fun task ->
+      let open Clientside in
+      let open Syntax in
+      let open Clientside_common in
+      let* task      = Task.to_dict task
+      and* task_name =
+        Attr_get.str "name" task in
+      Fs_socket.fetch !session_name task_name task
+      >>= Dict_get.str "return_value"
+      >>= Ast.literal_eval
+    end;
     stop_hosting ()
   );
   ()

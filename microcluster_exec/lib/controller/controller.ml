@@ -4,6 +4,12 @@ end
 
 module type Result = sig
   type t [@@deriving json]
+
+  val return_value : t -> string
+  (** [return_value result] gets the return value which is the raw /
+      serialization of a computed Python value.
+
+      @see The protocol from clientside as written in [/bin/main.ml] *)
 end
 
 type env =
