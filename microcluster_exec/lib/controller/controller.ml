@@ -6,10 +6,11 @@ module type Result = sig
   type t [@@deriving json]
 
   val return_value : t -> string
-  (** [return_value result] gets the return value which is the raw /
-      serialization of a computed Python value.
+  (** [return_value result] gets the return value of a result response.
+      
+      @return The raw / serialization of a computed Python value.
 
-      @see The protocol from clientside as written in [/bin/main.ml] *)
+      @see '/bin/main.ml' Based on the protocol from clientside. *)
 end
 
 type env =
@@ -30,5 +31,8 @@ module type Rpc = sig
     Result.t
 end
 
-let p : (module Rpc) option ref = ref None
+type p = (module Rpc) option ref
+[@@alert _deprecated "Needs proper plugin system."]
+
+let p : p = ref None
 

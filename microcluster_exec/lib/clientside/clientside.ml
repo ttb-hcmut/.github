@@ -1,3 +1,6 @@
+(** A monad for writing portable {{:https://dl.acm.org/doi/pdf/10.1145/3290357} skeletal semantics},
+    based on a Python-like programming language. *)
+
 type ('a, 'future_a) abstract_value =
   [ `Literal of 'a
   | `Promise of string * 'future_a

@@ -1,5 +1,7 @@
 open Clientside
 
+(** Serializes a {!module:Clientside} semantics into statement-based Python code. *)
+
 module Resolution = struct
   let lhs elt = let lhs, _ = elt in lhs
   let rhs elt = let _, rhs = elt in rhs
