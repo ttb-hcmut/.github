@@ -2,7 +2,7 @@ build:
 	python -m build
 
 install:
-	pip install --force-reinstall dist/microcluster_canvas*.whl
+	python -m build && pip install --force-reinstall dist/microcluster_canvas*.whl
 
 uninstall:
 	pip uninstall microcluster_canvas
