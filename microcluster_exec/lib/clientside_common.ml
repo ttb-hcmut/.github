@@ -98,12 +98,49 @@ let task__to_dict task =
      () in
   return (stmt, `Promise (varname, `Dict))
 
+let os__get_cwd () =
+  let open PyreAst.Concrete in
+  let varname = Name.make () in
+  let stmt =
+    Statement.make_assign_of_t
+      ~location
+      ~targets:[
+      ( Expression.make_name_of_t
+          ~location
+          ~id:(Identifier.make_t varname ())
+          ~ctx:(ExpressionContext.make_store_of_t ())
+          () ) ]
+      ~value:
+      ( Expression.make_call_of_t
+          ~location
+          ~func:
+          ( Expression.make_attribute_of_t
+              ~location
+              ~value:
+              ( Expression.make_name_of_t
+                  ~location
+                  ~id:(Identifier.make_t "os" ())
+                  ~ctx:(ExpressionContext.make_load_of_t ())
+                  () )
+              ~attr:(Identifier.make_t "getcwd" ())
+              ~ctx:(ExpressionContext.make_load_of_t ())
+              () )
+          ~args:[]
+          ~keywords:[]
+          () )
+     () in
+  return (stmt, `Promise (varname, `String))
+
 module Ast = struct
   let literal_eval = ast__literal_eval
 end
 
 module Fs_socket = struct
   let fetch = fs_socket__comm
+end
+
+module Os = struct
+  let getcwd = os__get_cwd
 end
 
 module Task = struct

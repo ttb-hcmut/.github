@@ -146,6 +146,35 @@ module Attr_get = struct
   let unknown = attr_get__unknown
 end
 
+let dict__init () =
+  let open PyreAst.Concrete in
+  let varname = Name.make () in
+  let stmt =
+    Statement.make_assign_of_t
+      ~location
+      ~targets:[
+      ( Expression.make_name_of_t
+          ~location
+          ~id:(Identifier.make_t varname ())
+          ~ctx:(ExpressionContext.make_store_of_t ())
+          () ) ]
+      ~value:
+      ( Expression.make_call_of_t
+        ~location
+        ~func:
+        ( Expression.make_name_of_t
+            ~location
+            ~id:(Identifier.make_t "dict" ())
+            ~ctx:(ExpressionContext.make_load_of_t ())
+            () )
+        () )
+     () in
+  return (stmt, `Promise (varname, `Dict))
+
+module Dict = struct
+  let init = dict__init
+end
+
 let dict_get__str attr receiver =
   let open PyreAst.Concrete in
   let receiver = parse_argument_dict receiver in
@@ -176,6 +205,46 @@ let dict_get__str attr receiver =
 
 module Dict_get = struct
   let str = dict_get__str
+end
+
+let dict_set__str attr value receiver =
+  let open PyreAst.Concrete in
+  let value    = parse_argument_string value
+  and arg_receiver = parse_argument_dict receiver in
+  let stmt =
+    Statement.make_assign_of_t
+      ~location
+      ~targets:[
+      ( Expression.make_name_of_t
+          ~location
+          ~id:(Identifier.make_t "_" ())
+          ~ctx:(ExpressionContext.make_store_of_t ())
+          () ) ]
+      ~value:
+      ( Expression.make_call_of_t
+        ~location
+        ~func:
+        ( Expression.make_attribute_of_t
+          ~location
+          ~value:arg_receiver
+          ~attr:(Identifier.make_t "update" ())
+          ~ctx:(ExpressionContext.make_load_of_t ())
+          () )
+        ~keywords:
+        [
+        ( Keyword.make_t
+            ~location
+            ~arg:(Identifier.make_t attr ())
+            ~value
+            ()
+        )
+        ]
+        () )
+     () in
+  return (stmt, receiver)
+
+module Dict_set = struct
+  let str = dict_set__str
 end
 
 module Name = Name

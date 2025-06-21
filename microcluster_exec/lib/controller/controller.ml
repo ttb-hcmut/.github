@@ -1,5 +1,8 @@
 module type Input = sig
   type t [@@deriving json]
+  val function_name : t -> string
+  val module_name : t -> string
+  val cwd : t -> string
 end
 
 module type Result = sig

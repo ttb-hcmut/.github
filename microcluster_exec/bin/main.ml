@@ -24,7 +24,7 @@ let backend_run ~backend =
           {|MICROCLUSTER_ENV=%s|}
           begin
             let open Clientside_jsont in
-            interceptor (`Promise ("task", `Object))
+            interceptor (`Promise ("self", `Object))
             |> encode_string
           end
       |] in
@@ -41,6 +41,16 @@ module Option0 = struct
 end
 
 let domain_name = "microcluster_exec"
+
+let controller__input__dict_set_all module_name function_name cwd x =
+  let open Clientside in
+  let open Syntax in
+  let open Clientside_common in
+  Dict_set.str "cwd" cwd x
+  >>= Dict_set.str
+    "function_name" function_name
+  >>= Dict_set.str
+    "module_name" module_name
 
 let main ~device ~verbose command =
   let open Eio in 
@@ -97,14 +107,20 @@ let main ~device ~verbose command =
     |> ignore
   );
   ( Fiber.fork ~sw @@ fun () ->
-    backend_run ~backend begin fun task ->
+    backend_run ~backend begin fun self ->
       let open Clientside in
       let open Syntax in
       let open Clientside_common in
-      let* task      = Task.to_dict task
-      and* task_name =
-        Attr_get.str "name" task in
-      Fs_socket.fetch !session_name task_name task
+      let* func_name =
+        Attr_get.str "__name__" self
+      and* module_name =
+        Attr_get.str "__module__" self
+      and* cwd =
+        Os.getcwd () in
+      ( Dict.init ()
+        >>= controller__input__dict_set_all
+          module_name func_name cwd )
+      >>= Fs_socket.fetch !session_name func_name
       >>= Dict_get.str "return_value"
       >>= Ast.literal_eval
     end;
