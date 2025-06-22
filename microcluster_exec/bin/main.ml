@@ -101,7 +101,7 @@ let main ~device ~verbose command =
     Switch.run @@ fun sw ->
     seq |> Seq.fold_left begin fun _ ctx ->
       let resolve_reply, inp = ctx in
-      Rpc.fold_left inp ~env ~sw |> fun r ->
+      Rpc.eval inp ~env ~sw |> fun r ->
       Fiber.fork ~sw @@ fun () ->
       Promise.await r
       |> Promise.resolve resolve_reply

@@ -28,7 +28,7 @@ type env =
 module type Rpc = sig
   module Input : Input
   module Result : Result
-  val fold_left :
+  val eval :
     Input.t ->
     env:env ->
     sw:Eio.Switch.t ->

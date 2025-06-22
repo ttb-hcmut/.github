@@ -95,7 +95,7 @@ let remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
   Module.make_t ~body ~type_ignores ()
   |> Result.ok
 
-let fold_left =
+let rpc__eval =
   let open Eio in
   let trn_cachemap = Hashtbl.create 10 in
   fun request ~env ~sw ->
@@ -162,7 +162,7 @@ let fold_left =
 module Rpc = struct
   module Input = Request
   module Result = Response
-  let fold_left = fold_left
+  let eval = rpc__eval
 end
 
 let () =
