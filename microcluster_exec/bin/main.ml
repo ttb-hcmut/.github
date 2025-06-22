@@ -222,10 +222,11 @@ end
 module Controller_make = struct
   let of_id x : (module Controller.RPC) = match x with
   | "micropython" -> (module Micropython_default_rpc : Controller.RPC)
-  | _             -> failwith "lol"
+  | _ -> failwith ("the device driver <name>" ^ x ^ "</name> is not supported")
 end
 
-let main ~device ~verbose command =
+let main command =
+  fun ~device ~device_driver ~verbose ->
   let open Eio in 
   Eio_main.run @@ fun env ->
   let env = object
@@ -254,7 +255,7 @@ let main ~device ~verbose command =
   let backend = backend
     (Stdenv.process_mgr env)
     command in
-  let module Rpc = (val Controller_make.of_id "micropython" : Controller.RPC) in
+  let module Rpc = (val Controller_make.of_id device_driver : Controller.RPC) in
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
   let seq, stop_hosting =
@@ -318,6 +319,14 @@ let main =
       ~doc:{|Open and use the specific $(docv).|}
       ~docv:"DEVICE"
     )
+  and+ device_driver =
+    Arg.
+    ( value
+    & opt string "micropython"
+    & info ["D"; "device-driver"]
+      ~doc:{|Use the specific $(docv).|}
+      ~docv:"DEVICE_DRIVER"
+    )
   and+ command =
     Arg.
     ( value
@@ -335,7 +344,9 @@ let main =
       ~docv:"VERBOSE"
     ) in
   let command = Command.parse_opt command in
-  main ~device ~verbose command
+  main
+    ~device ~device_driver ~verbose
+    command
 
 let () =
   if !Sys.interactive then () else

@@ -17,7 +17,7 @@
 - [ ] platformio script to build and install mpy modules
 
 Functional changes:
-- [ ] option to choose rpc controller
+- [x] option to choose rpc controller
 - [ ] error message from mpy execution, propagate remote exception to mainland
 - [x] verbose mode toggle
 
