@@ -61,9 +61,11 @@ async def _comm_manual(session, name, info):
   await aio_os.unlink(filename)
   return reply
 
+import uuid
+
 # NOTE(kinten): Works, but is obviously not efficient
 async def _comm_proc(session, name, info):
-  filename = f"{os.getenv("HOME")}/.var/fs_socket/{session}/{name}"
+  filename = f"{os.getenv("HOME")}/.var/fs_socket/{session}/{name}-{uuid.uuid4()}"
   await aio_os.mkfifo(filename)
   text = json.dumps(info)
   if True:
