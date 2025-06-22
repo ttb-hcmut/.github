@@ -1,11 +1,11 @@
-module type Input = sig
+module type INPUT = sig
   type t [@@deriving json]
   val function_name : t -> string
   val module_name : t -> string
   val cwd : t -> string
 end
 
-module type Result = sig
+module type RESULT = sig
   type t [@@deriving json]
 
   val return_value : t -> string
@@ -25,18 +25,12 @@ type env =
   ; err         : Eio_format.formatter option
   >
 
-module type Rpc = sig
-  module Input : Input
-  module Result : Result
+module type RPC = sig
+  module Input : INPUT
+  module Result : RESULT
   val eval :
     Input.t ->
     env:env ->
     sw:Eio.Switch.t ->
     Result.t Eio.Promise.t
 end
-
-type p = (module Rpc) option ref
-[@@alert _deprecated "Needs proper plugin system."]
-
-let p : p = ref None
-

@@ -1,5 +1,0 @@
-(library
- (public_name microcluster-micropython)
- (preprocess (pps microcluster_exec.log))
- (libraries re pyre-ast opine fpath jsont eio microcluster_exec.controller microcluster_exec.log_domain)
- (name module))
