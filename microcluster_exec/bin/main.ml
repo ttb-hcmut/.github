@@ -120,7 +120,7 @@ let main ~device ~verbose command =
       ( Dict.init ()
         >>= controller__input__dict_set_all
           module_name func_name cwd )
-      >>= Fs_socket.fetch !session_name func_name
+      >>= Fs_socket.fetch !session_name ~name:func_name
       >>= Dict_get.str "return_value"
       >>= Ast.literal_eval
     end;

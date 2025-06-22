@@ -15,7 +15,7 @@ let test_generic () =
     let* task      = Task.to_dict task
     and* task_name =
       Attr_get.str "name" task in
-    Fs_socket.fetch !session_name task_name task
+    Fs_socket.fetch !session_name ~name:task_name task
     >>= Dict_get.str "return_value"
     >>= Ast.literal_eval
   ) in

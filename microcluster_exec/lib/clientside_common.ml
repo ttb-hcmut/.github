@@ -2,13 +2,13 @@ open Clientside
 
 let fs_socket__comm :
   (string, [ `String ]) abstract_value ->
-  (string, [ `String ]) abstract_value ->
+  ?name:(string, [ `String ]) abstract_value ->
   (_, [ `Dict ]) abstract_value ->
   [ `Promise of string * [ `Dict ] ] program =
-  fun target data info ->
+  fun target ?name info ->
   let open PyreAst.Concrete in
   let arg_target = parse_argument_string target
-  and arg_data   = parse_argument_string data
+  and arg_name   = name |> Option.map parse_argument_string
   and info       = parse_argument_dict info
   and varname    =
     Name.make () in
@@ -33,8 +33,19 @@ let fs_socket__comm :
                   ~id:(Identifier.make_t "fs_socket.comm" ())
                   ~ctx:(ExpressionContext.make_load_of_t ())
                   () )
-              ~args:[arg_target; arg_data; info]
-              ~keywords:[]
+              ~args:[arg_target; info]
+              ~keywords:
+              ( []
+              @ ( match arg_name with
+                | None -> []
+                | Some x ->
+                [ Keyword.make_t
+                  ~location
+                  ~arg:(Identifier.make_t "name" ())
+                  ~value:x
+                  () ]
+                )
+              )
               () )
           ()
       )

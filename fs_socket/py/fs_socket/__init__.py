@@ -6,8 +6,8 @@ import aiofile
 import uuid
 
 # NOTE(kinten): Works, but is obviously not efficient
-async def _comm_proc(session, name, info):
-  filename = f"{os.getenv("HOME")}/.var/fs_socket/{session}/{name}-{uuid.uuid4()}"
+async def _comm_proc(session, info, *args, name=None):
+  filename = f"{os.getenv("HOME")}/.var/fs_socket/{session}/{"" if name is None else (name + "-")}{uuid.uuid4()}"
   await aio_os.mkfifo(filename)
   text = json.dumps(info)
   if True:
