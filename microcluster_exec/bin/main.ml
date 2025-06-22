@@ -221,7 +221,7 @@ end
 
 module Controller_make = struct
   let of_id x : (module Controller.RPC) = match x with
-  | "micropython" -> (module Micropython_default_rpc : Controller.RPC)
+  | "generic_micropython" -> (module Micropython_default_rpc : Controller.RPC)
   | _ -> failwith ("the device driver <name>" ^ x ^ "</name> is not supported")
 end
 
@@ -323,7 +323,7 @@ let main =
   and+ device_driver =
     Arg.
     ( value
-    & opt string "micropython"
+    & opt string "generic_micropython"
     & info ["D"; "device-driver"]
       ~doc:{|Use the specific $(docv).|}
       ~docv:"DEVICE_DRIVER"
