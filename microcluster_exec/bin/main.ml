@@ -256,6 +256,7 @@ let main command =
     (Stdenv.process_mgr env)
     command in
   let module Rpc = (val Controller_make.of_id device_driver : Controller.RPC) in
+  [%report0 "computer info:\n  nodes:\n    <name>{device_driver}</name>\n    <prepos>total</prepos> <number>1</number>"];
   Fs_socket.Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
   Switch.run @@ fun sw ->
   let seq, stop_hosting =
