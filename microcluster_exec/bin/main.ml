@@ -285,8 +285,8 @@ let main command =
   );
   ( Fiber.fork ~sw @@ fun () ->
     backend_run ~backend begin fun self ->
+      let open Clientside.Syntax in
       let open Clientside in
-      let open Syntax in
       let open Clientside_common in
       let* func_name =
         Attr_get.str "__name__" self
