@@ -31,7 +31,8 @@ module type Rpc = sig
   val fold_left :
     Input.t ->
     env:env ->
-    Result.t
+    sw:Eio.Switch.t ->
+    Result.t Eio.Promise.t
 end
 
 type p = (module Rpc) option ref

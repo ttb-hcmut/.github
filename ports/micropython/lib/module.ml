@@ -98,7 +98,7 @@ let remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
 let fold_left =
   let open Eio in
   let trn_cachemap = Hashtbl.create 10 in
-  fun request ~env ->
+  fun request ~env ~sw ->
   let process_mgr = Stdenv.process_mgr env
   and fs = Stdenv.fs env in
   let open Request in
@@ -106,49 +106,58 @@ let fold_left =
   | cached_trn, ((), cached_funname) ->
     if not (String.equal cached_funname request.function_name)
     then failwith {|each module must have only ONE function export|};
-    Promise.await cached_trn
+    cached_trn
   | exception Not_found ->
     let cache, resolve_cache = Promise.create ()
     and { module_name; _ }   = request in
     [%report0 "detected task <name>{module_name}</name>"];
     Hashtbl.add trn_cachemap module_name (cache, ((), request.function_name));
-    inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
-      begin fun text ->
-        let ( >>= ) = Result.bind in
-        let open PyreAst.Parser in
-        with_context @@ fun context ->
-        result_with_ok ~fail:(function
-          | { Error.message ; line ; column ; _ } ->
-            let message =
-              Printf.sprintf "Python parsing error at line %d, column %d: %s"
-                line column message in
-            failwith message
-        ) @@ fun () ->
-        Concrete.parse_module ~context text
-        >>= remove_microcluster_canvas
-        >>= fun ast ->
-        let open Opine in
-        Buffer.contents (Unparse.py_module (Unparse.State.default ()) ast).source
-        |> Result.ok
-      end
-    |> fun file ->
-    Mpremote.copy ~process_mgr ~null:(fun ~sw -> Path.open_out ~create:`Never ~sw Path.(fs / "/dev/null"))
-      ~from:
-        (`local
-          (Fpath.v (Path.native_exn file)))
-      ~dest:(`remote (`mpy, Fpath.(v (request.module_name ^ ".py") )))
-    ;
-    let conn () =
-      Mpremote.Commands.parse_out ~process_mgr Mpremote.Command.
-        [ Exec (Printf.sprintf "import %s" request.module_name)
-        ; Exec (Printf.sprintf "import asyncio")
-        ; Eval (Printf.sprintf "asyncio.run(%s.%s())" request.module_name request.function_name)
-        ] in
-    Promise.resolve resolve_cache conn;
-    conn
+    ( Fiber.fork ~sw @@ fun () ->
+      inplace_transform_file ~process_mgr ~fs Path.(fs / request.cwd / (request.module_name ^ ".py"))
+        begin fun text ->
+          let ( >>= ) = Result.bind in
+          let open PyreAst.Parser in
+          with_context @@ fun context ->
+          result_with_ok ~fail:(function
+            | { Error.message ; line ; column ; _ } ->
+              let message =
+                Printf.sprintf "Python parsing error at line %d, column %d: %s"
+                  line column message in
+              failwith message
+          ) @@ fun () ->
+          Concrete.parse_module ~context text
+          >>= remove_microcluster_canvas
+          >>= fun ast ->
+          let open Opine in
+          Buffer.contents (Unparse.py_module (Unparse.State.default ()) ast).source
+          |> Result.ok
+        end
+      |> fun file ->
+      Mpremote.copy ~process_mgr ~null:(fun ~sw -> Path.open_out ~create:`Never ~sw Path.(fs / "/dev/null"))
+        ~from:
+          (`local
+            (Fpath.v (Path.native_exn file)))
+        ~dest:(`remote (`mpy, Fpath.(v (request.module_name ^ ".py") )))
+      ;
+      let conn () =
+        Mpremote.Commands.parse_out ~process_mgr Mpremote.Command.
+          [ Exec (Printf.sprintf "import %s" request.module_name)
+          ; Exec (Printf.sprintf "import asyncio")
+          ; Eval (Printf.sprintf "asyncio.run(%s.%s())" request.module_name request.function_name)
+          ] in
+      Promise.resolve resolve_cache conn
+    );
+    cache
   )
-  |> fun f -> f ()
-  |> Response.make
+  |> fun cache ->
+  let promise_result, resolve_result = Promise.create () in
+  ( Fiber.fork ~sw @@ fun () ->
+    Promise.await cache
+    |> fun fn -> fn ()
+    |> Response.make
+    |> Promise.resolve resolve_result
+  );
+  promise_result
 
 module Rpc = struct
   module Input = Request
