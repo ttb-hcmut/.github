@@ -2,7 +2,7 @@
 
 Build Dependencies:
 - dune
-- GNU Make (optional)
+- make
 
 Runtime Dependencies:
 - mpremote
@@ -10,42 +10,33 @@ Runtime Dependencies:
 ### Build
 
 ```sh
-cd microcluster_exec
-
-make
-# or
-make build
-# or
-dune build
+make -C microcluster_exec
 ```
 
 ### Install
 
 ```sh
-cd microcluster_exec
-
-make install
-# or
-opam install ./
+make -C microcluster_exec install
 ```
-
-### Run
-
-Assume you've installed:
-
-```
-$ microcluster_exec 
-usage: microcluster_exec [-hv] -F PORT FILENAME
-```
-
-Refer manual / documentation for more information.
 
 ### Test
 
 ```sh
-cd microcluster_exec
+make -C microcluster_exec test
+```
 
-make test
-# or
-dune test
+## How to use
+
+### Run
+
+```sh
+echo 'print("Hello world!")' > example.py
+microcluster_exec python example.py
+# Hello world!
+```
+
+### Help
+
+```sh
+microcluster_exec --help
 ```
