@@ -1,29 +1,35 @@
 ## Develop
 
+Operating Systems:
+- Linux
+- Mac
+
 Build Dependencies:
-- dune
-- make
+- make (part of Ubuntu's [build-essential](https://launchpad.net/ubuntu/+source/build-essential))
+- [dune](https://dune.build/install)
 
 Runtime Dependencies:
-- mpremote
+- [mpremote](https://pypi.org/project/mpremote/)
 
 ### Build
 
 ```sh
-make -C microcluster_exec
+make
 ```
 
 ### Install
 
 ```sh
-make -C microcluster_exec install
+make install
 ```
 
 ### Test
 
 ```sh
-make -C microcluster_exec test
+make test
 ```
+
+> In practice, it's more convenient to run commands from one place without manually changing working directory. From root of the mono-repository, run any `make` command with the flag `-C microcluster_exec`; for example, `make -C microcluster_exec install`
 
 ## How to use
 
