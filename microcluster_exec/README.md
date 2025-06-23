@@ -31,12 +31,19 @@ make -C microcluster_exec test
 
 ```sh
 echo 'print("Hello world!")' > example.py
-microcluster_exec python example.py
-# Hello world!
+microcluster_exec --verbose python example.py
 ```
+
+<p align="center">
+  <img src="./doc/wincap_run.png" />
+</p>
 
 ### Help
 
 ```sh
 microcluster_exec --help
 ```
+
+<p align="center">
+  <img src="./doc/wincap_man.png" />
+</p>
