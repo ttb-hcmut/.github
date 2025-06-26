@@ -8,7 +8,7 @@ run:
 	dune exec microcluster_exec
 
 install:
-	opam install ./ --deps-only && opam reinstall --working-dir ./
+	dune exec opam install .
 
 test:
 	dune test
