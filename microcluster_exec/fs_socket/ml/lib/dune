@@ -1,4 +1,5 @@
 (library
- (libraries eio jsont jsont.bytesrw)
+ (libraries eio jsont jsont.bytesrw uuidm)
+ (preprocess (pps ppx_fields_conv))
  (public_name fs_socket)
  (name fs_socket))

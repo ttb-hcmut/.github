@@ -22,23 +22,36 @@ module Request = struct
     |> Object.finish
 end
 
-let () =
+let test_simple () =
   let open Eio in
   Eio_main.run @@ fun env ->
-  Switch.run @@ fun sw ->
   let vardir =
     let homedir = Path.(Stdenv.fs env / Sys.getenv "HOME") in
     Path.(homedir / ".var")
+  and clock = Stdenv.clock env
   and process_mgr = Stdenv.process_mgr env in
-  let session_name = "example_session" in
-  Namespace.with_make ~vardir session_name @@ fun ~vardir ~session_name ->
-  Namespace_watch.all ~process_mgr ~ejsont:Response.jsont ~fjsont:Request.jsont ~vardir ~session_name ~sw
-  |> function seq, _ ->
+  let name = "example_session" in
+  Namespace.with_open_in ~vardir ~name @@ fun session ->
   Switch.run @@ fun sw ->
-  begin Fiber.fork ~sw @@ fun () ->
-    seq |> Seq.fold_left (fun _ x ->
-      Fs_socket.reply x @@ fun _ ->
-      Response.make 1
-    ) ()
-    |> ignore
-  end
+  ( Fiber.fork_daemon ~sw @@ fun () ->
+    session |> Namespace_watch.all
+      ~process_mgr
+      ~o:(module Response)
+      ~i:(module Request)
+      begin fun _ ->
+        Response.make 1
+      end;
+    `Stop_daemon
+  );
+  Time.sleep clock 2.;
+  Alcotest.(check bool)
+    "session directory should exist"
+    true Path.(is_directory (vardir / "fs_socket" / name))
+
+open Alcotest;;
+
+run "Fs_socket"
+[ "activation",
+  [ test_case "Simple" `Quick test_simple
+  ]
+]

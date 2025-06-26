@@ -31,6 +31,5 @@ module type RPC = sig
   val eval :
     Input.t ->
     env:env ->
-    sw:Eio.Switch.t ->
-    Result.t Eio.Promise.t
+    Result.t
 end

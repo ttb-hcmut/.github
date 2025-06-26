@@ -3,5 +3,5 @@
  (name main)
  (flags -linkall)
  (preprocess
-  (pps microcluster_exec.log))
- (libraries microcluster_exec microcluster_exec.clientside_jsont jsont fs_socket eio eio_main cmdliner uuidm microcluster_exec.log_domain))
+  (pps microcluster_exec.log ppx_fields_conv))
+ (libraries microcluster_exec microcluster_exec.clientside_jsont jsont fs_socket eio eio_main cmdliner microcluster_exec.log_domain))

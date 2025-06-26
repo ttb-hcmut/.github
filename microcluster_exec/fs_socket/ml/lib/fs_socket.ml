@@ -1,5 +1,6 @@
 module Namespace = Namespace
 module Namespace_watch = Namespace_watch
+module Socket = Socket
 
 let with_promise = Promise.with_promise
 
