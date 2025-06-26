@@ -27,3 +27,33 @@ In exhibit 2. All communication logic is defined by the frontend; the flow of co
 Kinten's opinion is, unless performance is in dire shape, prefer expression over performance.
 
 [^redirect]: It's possible to redirect the output _channel_ of one formatter to a different channel. But how to apply this idea to different formatters is still unsolved.
+
+## Microcluster_exec
+Microcluster_exec is a composite interpreter. In the architecture of Microcluster_exec, there are two subinterpreters: the back-end interpreter that evaluates the program (Python, UTop, etc) and the front-end interpreter that intercepts the back-end interpreter during async task and delivers those tasks to the microcluster device for remote evaluation.
+
+The flow can be shown by this simplified program in the ML Eio language
+
+```ml
+let command = Command.infer Sys.input_file Sys.other_args in
+Communication.with_socket_open @@ fun socket ->
+Switch.run @@ fun sw ->
+( Fiber.fork ~sw @@ fun ->
+  Communication.listen socket ~onrequest:begin fun request ->
+    Microcluster.Rpc.eval request
+    |> serialize
+  end
+);
+( Fiber.fork ~sw @@ fun () ->
+  Backend.run command ~ontask:begin fun task ->
+    Communication.fetch socket task
+    |> Python_ast.eval_value
+  end
+)
+```
+
+which can be rendered into the sequence diagram below
+![Microcluster Execution Flow](./microcluster_exec_sequence.svg)
+
+This composite architecture is optimized for modularity. The input code is guaranteed to be correctly interpreted: the code is understood by the **back-end interpreter**, an interpreter which can be customized (by changing the input command) to be any external program that the user expects to interpret their code[^1].
+
+[^1]: Currently there are some compromises: we only support two external programs — **Python** and **UTop** — for sane issue tracking, and the async functions must be marked with the `parallel()` decorator.  
