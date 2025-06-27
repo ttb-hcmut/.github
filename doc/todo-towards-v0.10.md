@@ -3,3 +3,4 @@
 - [ ] tests for microcluster_exec
 - [ ] build system for python: migrate from hatchling to uv
 - [ ] migrate from concrete ast to tagless final ast
+- [ ] migrate from make to nix
