@@ -34,11 +34,12 @@ let test_simple () =
   Namespace.with_open_in ~vardir ~name @@ fun session ->
   Switch.run @@ fun sw ->
   ( Fiber.fork_daemon ~sw @@ fun () ->
-    session |> Namespace_watch.all
+    session |> Namespace_watch.iter
       ~process_mgr
       ~o:(module Response)
       ~i:(module Request)
-      begin fun _ ->
+      begin fun x ->
+        Fs_socket.Socket.reply x @@ fun _ ->
         Response.make 1
       end;
     `Stop_daemon

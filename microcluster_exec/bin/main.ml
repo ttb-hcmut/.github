@@ -33,7 +33,7 @@ let backend_run ~backend =
   Eio.Process.run backend.process_mgr ~env
     (Command.unparse backend.command)
 
-let controller__input__dict_set_all module_name function_name cwd x =
+let _'controller'input'dict_set'all module_name function_name cwd x =
   let open Clientside in
   let open Clientside.Syntax in
   let open Clientside_common in
@@ -84,7 +84,7 @@ module Request = struct
     |> Object.finish
 end
 
-let remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
+let _'remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
   let open PyreAst.Concrete in
   let body = ast.body |> List.fold_left (fun acc x -> match x with
     | Statement.ImportFrom { names; location; module_ = Some module_; level } when String.equal (Identifier.to_string module_) "microcluster_canvas" ->
@@ -131,7 +131,7 @@ let remove_microcluster_canvas (ast: PyreAst.Concrete.Module.t) =
   Module.make_t ~body ~type_ignores ()
   |> Result.ok
 
-let _rpc__eval env request =
+let _'rpc'eval env request =
   let open Eio in
   let open Request in
   let process_mgr = Stdenv.process_mgr env
@@ -149,7 +149,7 @@ let _rpc__eval env request =
             line column message in
         failwith message end @@ fun () ->
     Concrete.parse_module ~context text
-    >>= remove_microcluster_canvas
+    >>= _'remove_microcluster_canvas
     >>= Opine.unparse_py_module
   end
   |> begin fun file ->
@@ -167,7 +167,7 @@ let _rpc__eval env request =
       ] in
   conn
 
-let _rpc__eval =
+let _'rpc'eval =
   let open Eio in
   let trn_cachemap = Hashtbl.create 10 in
   let mutex = Mutex.create () in
@@ -184,7 +184,7 @@ let _rpc__eval =
     let { module_name; _ }   = request in
     [%report0 "detected task <name>{module_name}</name>"];
     ( Fiber.fork_promise ~sw @@ fun () ->
-      _rpc__eval env request
+      _'rpc'eval env request
     ) |> fun cache_trn ->
     Hashtbl.add trn_cachemap module_name (cache_trn, ((), request.function_name));
     cache_trn
@@ -196,7 +196,7 @@ let _rpc__eval =
 module Micropython_default_rpc : Controller.RPC = struct
   module Input = Request
   module Result = Response
-  let eval = _rpc__eval
+  let eval = _'rpc'eval
 end
 
 module Controller_make = struct
@@ -239,7 +239,9 @@ let main command =
   Fs_socket.Namespace.with_open_in ~vardir @@ fun socket ->
   Switch.run @@ fun sw ->
   ( Fiber.fork_daemon ~sw @@ fun () ->
-    socket |> Fs_socket.Namespace_watch.all begin fun inp ->
+    let open Fs_socket in
+    socket |> Namespace_watch.iter begin fun x ->
+      Socket.reply x @@ fun inp ->
       ( object
           method verbose = verbose
           method stderr = env#stderr
@@ -273,7 +275,7 @@ let main command =
     and* cwd =
       Os.getcwd () in
     ( Dict.init ()
-      >>= controller__input__dict_set_all
+      >>= _'controller'input'dict_set'all
         module_name func_name cwd )
     >>=
     ( let socket = Server__fs_socket.Socket.session_name socket in
