@@ -7,9 +7,16 @@ Operating Systems:
 Build Dependencies:
 - make (part of Ubuntu's [build-essential](https://launchpad.net/ubuntu/+source/build-essential))
 - [dune](https://dune.build/install)
+- [opam](https://opam.ocaml.org/doc/Install.html)
 
 Runtime Dependencies:
 - [mpremote](https://pypi.org/project/mpremote/)
+
+### First-time Setup
+
+```sh
+make init
+```
 
 ### Build
 

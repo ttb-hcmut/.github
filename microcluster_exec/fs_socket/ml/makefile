@@ -4,10 +4,8 @@ build:
 	dune build
 
 init:
-	opam pin add fs_socket
 
 run:
-	@echo "warning: OCaml dynamic linking will not work when running program in this mode"
 	dune exec microcluster_exec
 
 install:

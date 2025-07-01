@@ -19,7 +19,7 @@
  (name microcluster_exec)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml)
+ (depends alcotest re fpath jsont bytesrw ppx_fields_conv eio eio_main fs_socket ocaml pyre-ast opine cmdliner)
  (tags
   ("add topics" "to describe" your project)))
 
