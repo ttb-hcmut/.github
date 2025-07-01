@@ -36,7 +36,6 @@ let backend_run ~backend =
 let _'controller'input'dict_set'all module_name function_name cwd x =
   let open Clientside in
   let open Clientside.Syntax in
-  let open Clientside_common in
   Dict_set.str "cwd" cwd x
   >>= Dict_set.str
     "function_name" function_name
@@ -208,6 +207,7 @@ open Eio
 
 let main command =
   fun ~device ~device_driver ~verbose ->
+  device |> ignore;
   Eio_main.run @@ fun env ->
   let env = object
     method cwd = env#cwd
