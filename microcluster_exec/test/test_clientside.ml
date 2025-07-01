@@ -22,7 +22,7 @@ let test_generic () =
   intercept
   |> upine
   |> Clientside_jsont.encode_string
-  |> Alcotest.(check string) "lol" {|[{"rhs_type":"normal","lhs":"a","rhs":"task.to_dict()"},{"rhs_type":"normal","lhs":"b","rhs":"task.name"},{"rhs_type":"await","lhs":"c","rhs":"fs_socket.comm(\"a81-yuu-znm\", b, a)"},{"rhs_type":"normal","lhs":"ca","rhs":"c[\"return_value\"]"},{"rhs_type":"normal","lhs":"cb","rhs":"ast.literal_eval(ca)"}]|}
+  |> Alcotest.(check string) "lol" {|[{"rhs_type":"normal","lhs":"a","rhs":"task.to_dict()"},{"rhs_type":"normal","lhs":"b","rhs":"task.name"},{"rhs_type":"await","lhs":"c","rhs":"fs_socket.comm(\"a81-yuu-znm\", a, name=b)"},{"rhs_type":"normal","lhs":"ca","rhs":"c[\"return_value\"]"},{"rhs_type":"normal","lhs":"cb","rhs":"ast.literal_eval(ca)"}]|}
 
 open Alcotest
 
