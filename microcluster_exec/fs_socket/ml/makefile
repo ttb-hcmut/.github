@@ -4,6 +4,7 @@ build:
 	dune build
 
 init:
+	opam pin add .
 
 run:
 	dune exec microcluster_exec
