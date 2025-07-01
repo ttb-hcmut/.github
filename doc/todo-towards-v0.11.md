@@ -6,4 +6,4 @@ Documentation:
 - [ ] a typst cetz paper: sequence diagram for fs_socket client/servers
 - [ ] a motion canvas video illustrates the pipeline
 - [ ] a typst cetz paper: ports/micropython program processing pipeline
-- [ ] a typst cetz paper: activity diagram for microcluster_exec frontend/backend fibers
+- [x] a typst cetz paper: activity / sequence diagram for microcluster_exec frontend/backend fibers
