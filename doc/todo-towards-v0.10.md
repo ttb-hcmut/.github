@@ -4,3 +4,5 @@
 - [ ] build system for python: migrate from hatchling to uv
 - [ ] migrate from concrete ast to tagless final ast
 - [ ] migrate from make to nix
+Documentation
+- [ ] rewrite `doc/design-notes.md` to follow the template [here](https://gist.github.com/kinten108101/1436f0545ffba9f40125153aa66fe915)
