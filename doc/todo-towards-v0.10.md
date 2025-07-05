@@ -7,3 +7,4 @@
 
 Documentation
 - [ ] rewrite `doc/design-notes.md` to follow the template [here](https://gist.github.com/kinten108101/1436f0545ffba9f40125153aa66fe915)
+- [ ] ocaml tutorial, preferably written in [Quarkdown](https://github.com/iamgio/quarkdown)
