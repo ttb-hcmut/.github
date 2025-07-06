@@ -150,10 +150,7 @@ To address this, we introduced `Microcluster_exec.Clientside`, a monadic system 
 
 For our system, we use **Exhibit 2: frontend-defined protocol**.
 
-This design improves observability and developer ergonomics, at the cost of some complexity. The monadic `Clientside` abstraction helps mitigate the OCaml-to-Python translation barrier. While marked experimental, this system is aligned with our philosophy of **expression over performance**.[^0]
-
-[^0]: Kinten’s opinion: expressiveness matters more unless performance becomes a blocker.
-
+This design improves observability and developer ergonomics, at the cost of some complexity. The monadic `Clientside` abstraction helps mitigate the OCaml-to-Python translation barrier. While marked experimental, this system is aligned with our philosophy of **expression over performance**.
 ---
 
 # Microcluster\_exec Architecture
@@ -189,7 +186,7 @@ This renders as the following sequence diagram:
 
 This modular architecture ensures the code is interpreted correctly:
 
-* The backend interpreter is pluggable (Python or UTop)
+* The backend interpreter is pluggable (Python or UTop) [^1]
 * Async tasks are offloaded to the microcluster for remote execution
 
 [^1]: Currently we only support Python and UTop backends(for sane issue tracking), and async tasks must be marked with the `parallel()` decorator to be intercepted correctly.
