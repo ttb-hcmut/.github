@@ -19,7 +19,7 @@
  (name fs_socket)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends alcotest ocaml uuidm eio)
+ (depends alcotest ocaml uuidm eio ppx_fields_conv)
  (tags
   ("add topics" "to describe" your project)))
 
