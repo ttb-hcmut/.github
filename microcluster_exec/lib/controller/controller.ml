@@ -16,14 +16,14 @@ module type RESULT = sig
       @see '/bin/main.ml' Based on the protocol from clientside. *)
 end
 
-type env =
-  < stderr      : [ `Flow | `Unix_fd | `W ] Eio.Resource.t
-  ; domain_name : string
-  ; verbose     : bool
-  ; process_mgr : [`Unix | `Generic] Eio.Process.mgr_ty Eio.Resource.t
-  ; fs          : Eio.Fs.dir_ty Eio.Path.t
-  ; err         : Eio_format.formatter option
-  >
+(** copied from Eio_unix.sink_ty *)
+type unix_sink_ty = [`Unix_fd | `W | `Close | `Flow]
+
+class virtual env = object
+  inherit [unix_sink_ty] Log_domain.domain_err
+  method virtual process_mgr : [`Unix | `Generic] Eio.Process.mgr_ty Eio.Resource.t
+  method virtual fs          : Eio.Fs.dir_ty Eio.Path.t
+end
 
 module type RPC = sig
   module Input : INPUT

@@ -6,7 +6,7 @@
 - [x] ensure colorful output, like nix (highlight names, separation between semantic and symbolic markup, modify cmdliner's err formatter?)
 - [x] when passing capabilities [^capability] to external functions, use object type
 - [x] logging for external module (domain_err), log for ports/micropython
-- [ ] new deriving-like macro to derive from/for object type (so `Controller.env` can derive from `Log_domain.domain_err`) (`[@@r-object-deriving]`)
+- [x] ~new deriving-like macro to derive from/for object type (so `Controller.env` can derive from `Log_domain.domain_err`) (`[@@r-object-deriving]`)~ (CANCELLED, use virtual class)
 - [x] new deriving macro [^deriving]: jsont / json serializable
 - [x] ppx-based logging
 - [ ] (cont. of Dynlink) dynamic module system
