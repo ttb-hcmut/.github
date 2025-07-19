@@ -1,6 +1,6 @@
 (lang dune 3.16)
 
-(name microcluster_exec)
+(name ppx-jsont)
 
 (generate_opam_files true)
 
@@ -16,10 +16,10 @@
 (documentation https://url/to/documentation)
 
 (package
- (name microcluster_exec)
+ (name ppx-jsont)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends alcotest re fpath jsont bytesrw ppx_fields_conv eio eio_main fs_socket ocaml pyre-ast opine cmdliner ppx-jsont)
+ (depends ocaml ppxlib)
  (tags
   ("add topics" "to describe" your project)))
 

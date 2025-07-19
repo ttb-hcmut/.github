@@ -1,5 +1,0 @@
-(library
- (public_name microcluster_exec.jsont.ppx)
- (libraries ppxlib)
- (kind ppx_deriver)
- (name jsont_ppx))
