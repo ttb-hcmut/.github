@@ -3,11 +3,11 @@ type runner =
   | `Utop
   ]
 
-let runner_to_string (x: runner) = match x with
+let runner_to_string : runner -> string = function
   | `Python -> "python"
   | `Utop   -> "utop"
 
-let runner_parse_opt = function
+let runner_parse_opt : string -> runner option = function
   | "python"
   | "py"
   | "python3" -> Some `Python
