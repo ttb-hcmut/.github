@@ -4,15 +4,14 @@ module Path0 = struct
     Process.run process_mgr ["sh"; "-c"; "echo '" ^ str ^ "' > " ^ (Path.native_exn path)]
 end
 
-module type SERIALIZABLE = sig
-  type t
-  val jsont: t Jsont.t
+module type Serde = sig
+  type t [@@deriving json]
 end
 
 let iter
 (type input output)
-(module I : SERIALIZABLE with type t = input)
-(module O : SERIALIZABLE with type t = output)
+(module I : Serde with type t = input)
+(module O : Serde with type t = output)
 process_mgr dir inode f =
   let open Eio in
   let socket = Path.(dir / inode) in
