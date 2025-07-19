@@ -33,7 +33,8 @@ let backend_run ~backend =
   Eio.Process.run backend.process_mgr ~env
     (Command.unparse backend.command)
 
-let _'controller'input'dict_set'all module_name function_name cwd x =
+let _'controller'input'dict_set'all =
+  fun module_name function_name cwd x ->
   let open Clientside in
   let open Clientside.Syntax in
   Dict_set.str "cwd" cwd x
@@ -180,7 +181,7 @@ let _'rpc'eval =
     then failwith {|each module must have only ONE function export|};
     cached_trn
   | exception Not_found ->
-    let { module_name; _ }   = request in
+    let { module_name; _ } = request in
     [%report0 "detected task <name>{module_name}</name>"];
     ( Fiber.fork_promise ~sw @@ fun () ->
       _'rpc'eval env request
@@ -199,7 +200,8 @@ module Micropython_default_rpc : Controller.RPC = struct
 end
 
 module Controller_make = struct
-  let dynamic x : (module Controller.RPC) = match x with
+  let dynamic x : (module Controller.RPC) =
+    match x with
   | _ -> failwith ("the device driver <name>" ^ x ^ "</name> is not supported")
 end
 
