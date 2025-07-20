@@ -1,3 +1,5 @@
+open Mpremote
+
 module Backend = struct
   exception Internal_failure of int
 
@@ -14,8 +16,6 @@ let traceback =
 
 let ( ^. ) = Re.Group.get
 let quoted x = "\"" ^ x ^ "\""
-let magenta x = "\x1B[0;35m" ^ x ^ "\x1B[0m"
-let bold_magenta x = "\x1B[1;35m" ^ x ^ "\x1B[0m"
 
 let prettify_file_location =
   let pattern =
@@ -24,6 +24,7 @@ let prettify_file_location =
     |> whole_string
     |> compile in
   Re.replace pattern ~f:begin fun groups ->
+    let open Ansi_colors in
     Printf.sprintf "  File %s, line %s, in %s"
       (magenta @@ quoted @@ groups ^. 1)
       (magenta @@ groups ^. 2)
@@ -37,6 +38,7 @@ let prettify_exception_msg =
     |> whole_string
     |> compile in
   Re.replace pattern ~f:begin fun groups ->
+    let open Ansi_colors in
     Printf.sprintf
       "%s: %s"
       (bold_magenta @@ groups ^. 1)
