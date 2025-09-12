@@ -1,5 +1,7 @@
 - [ ] Documentation on writing Microcluster_exec port modules (tutorial, cookbook, reference)
 - [ ] Prune capabilities: reimplement mktemp in pure OCaml for cwd; ...
+- [ ] improved monorero build system (opam-monorepo? opam overlays?)
+- [ ] formatter: migrate to ppx_regexp for better DX
 
 Documentation:
 - [ ] document modules and functions (format, eio_format, clientside)
