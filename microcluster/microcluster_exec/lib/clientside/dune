@@ -1,0 +1,4 @@
+(library
+ (libraries pyre-ast opine)
+ (public_name microcluster_exec.clientside)
+ (name clientside))

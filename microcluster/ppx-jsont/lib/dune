@@ -1,0 +1,5 @@
+(library
+ (public_name ppx-jsont)
+ (libraries ppxlib)
+ (kind ppx_deriver)
+ (name ppx_jsont))

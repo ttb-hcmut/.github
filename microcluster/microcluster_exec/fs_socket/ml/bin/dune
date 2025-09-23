@@ -1,0 +1,4 @@
+(executable
+ (public_name fs_socket)
+ (name main)
+ (libraries fs_socket))
