@@ -1,8 +1,8 @@
-This document discusses the evolution of the formatter system. The problem is how to preprocess stderr output with styling (such as colors), in a way that is composable and maintains clarity of semantics.
-
 This template is inspired by the formats of [this](https://github.com/ocaml-multicore/eio/blob/main/doc/rationale.md). We use it flexibly to express design tradeoffs.
 
 ## Formatter
+
+Here we discuss the evolution of the formatter system. The problem is how to preprocess stderr output with styling (such as colors), in a way that is composable and maintains clarity of semantics.
 
 In XXXX, we introduced formatters, a preprocessing stage to add colors to stderr output.
 
