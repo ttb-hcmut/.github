@@ -7,4 +7,4 @@
 
 Documentation
 - [x] rewrite `doc/design-notes.md` to follow the template [here](https://gist.github.com/kinten108101/1436f0545ffba9f40125153aa66fe915)
-- [ ] ocaml tutorial, preferably written in [Quarkdown](https://github.com/iamgio/quarkdown)
+- [x] ocaml tutorial, preferably written in [Quarkdown](https://github.com/iamgio/quarkdown). PS: See [/bkhack/doc/thesis-week-2-ml](https://github.com/ttb-hcmut/bkhack/tree/main/doc/thesis-week-2-ml/main.qd).
