@@ -1,0 +1,3 @@
+[submodule "microcluster/opine"]
+	path = microcluster/opine
+	url = git@github.com:kinten108101/opine.git

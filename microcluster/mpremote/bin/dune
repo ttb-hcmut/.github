@@ -1,0 +1,4 @@
+(executable
+ (public_name mpremote.color)
+ (name main)
+ (libraries mpremote eio eio_main re ocolor containers))
