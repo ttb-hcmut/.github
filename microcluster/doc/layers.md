@@ -17,6 +17,8 @@ def main():
 
 Parallelize machine-learning program. Translate neural network to pipelines. Expect some kind of structured concurrency (async, thread (?))
 
+Syntax and language for implicit task-based parallelism [^like-regent].
+
 Python / OCaml code generation, transformation
 
 File: `process_unet_nodek.py`
@@ -93,3 +95,5 @@ Need to have:
 ## Layer 0
 
 Physical chassis / frame of the computer. So that we can install (bolt-in and wire-up) a cluster of MCU devices -> a cluster computer. 1 aggregator device, and (N - 1) devices. Communicate via i2c (?)
+
+[^like-regent]: Possibily like Regent lang, see https://regent-lang.org
