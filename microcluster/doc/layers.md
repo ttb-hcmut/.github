@@ -48,11 +48,13 @@ if __name__ == "__main__":
 
 ## Layer 3.5
 
-Session-based IPC message-broker / socket library
+Session-based IPC message-broker / socket library for multi-process communication
+
+eDSL for writing "cross-process procedures" [^jfp][^codecomp].
 
 ## Layer 3
 
-Task distributor
+Distribute tasks to nodes in microcluster
 
 ```
 $ microcluster_exec -F /dev/ttyACM0 ./main.py
@@ -97,3 +99,7 @@ Need to have:
 Physical chassis / frame of the computer. So that we can install (bolt-in and wire-up) a cluster of MCU devices -> a cluster computer. 1 aggregator device, and (N - 1) devices. Communicate via i2c (?)
 
 [^like-regent]: Possibily like Regent lang, see https://regent-lang.org
+
+[^jfp]: tagless-final style, see https://okmij.org/ftp/tagless-final
+
+[^codecomp]: lightweight components, see https://www.researchgate.net/publication/220941847_Lightweight_and_Generative_Components_I_Source-Level_Components
