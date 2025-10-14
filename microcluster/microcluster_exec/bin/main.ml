@@ -295,16 +295,7 @@ let main command =
     let open Fs_socket in
     socket |> Namespace_watch.iter begin fun x ->
       Socket.reply x @@ fun inp ->
-      ( object
-          method verbose = verbose
-          method stderr = env#stderr
-          method fs = env#fs
-          method domain_name = env#domain_name
-          method process_mgr = env#process_mgr
-          method err = env#err
-        end
-        :> Controller.env
-      ) |> fun env ->
+      let env = (env :> Controller.env) in
       Rpc.eval inp ~env
     end
       ~process_mgr:(Stdenv.process_mgr env)
@@ -313,25 +304,27 @@ let main command =
     |> ignore;
     `Stop_daemon
   );
-  let backend = backend
-    (Stdenv.process_mgr env)
-    command (Stdenv.cwd env) in
-  backend_run ~backend (module functor (C : Clientside) -> struct let f ~func () =
-    let module Server__fs_socket = Fs_socket in
-    let open C in
-    let s_ = string in
-    let+ ast = import (module Ast) in
-    let module Ast = Ast.M(val ast) in
-    let+ os = import (module Os) in
-    let module Os = Os.M(val os) in
-    let* resp = ref @@ await @@
-      let func = Function.v2 !func in
-      Fs_socket.fetch (s_ (Server__fs_socket.Socket.session_name socket)) (Dict.of_assoc__single_t [string "function_name", Function.r__name__ func; string "module_name", Function.r__module__ func; string "cwd", Os.getcwd ()]) () in
-    let* lol = ref @@ Dict.(!. !resp (s_ "return_value") ) in
-    let- lol = assert__isinstance lol klass__string in
-    let* xx = ref @@ Ast.literal_eval !lol in
-    return !xx
-  end)
+  ( Fiber.fork ~sw @@ fun () ->
+    let backend = backend
+      (Stdenv.process_mgr env)
+      command (Stdenv.cwd env) in
+    backend_run ~backend (module functor (C : Clientside) -> struct let f ~func () =
+      let module Server__fs_socket = Fs_socket in
+      let open C in
+      let s_ = string in
+      let+ ast = import (module Ast) in
+      let module Ast = Ast.M(val ast) in
+      let+ os = import (module Os) in
+      let module Os = Os.M(val os) in
+      let* resp = ref @@ await @@
+        let func = Function.v2 !func in
+        Fs_socket.fetch (s_ (Server__fs_socket.Socket.session_name socket)) (Dict.of_assoc__single_t [string "function_name", Function.r__name__ func; string "module_name", Function.r__module__ func; string "cwd", Os.getcwd ()]) () in
+      let* lol = ref @@ Dict.(!. !resp (s_ "return_value") ) in
+      let- lol = assert__isinstance lol klass__string in
+      let* xx = ref @@ Ast.literal_eval !lol in
+      return !xx
+    end)
+  )
 
 open Cmdliner
 
