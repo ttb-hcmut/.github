@@ -17,7 +17,9 @@ def main():
 
 Parallelize machine-learning program. Translate neural network to pipelines. Expect some kind of structured concurrency (async, thread (?))
 
-Python / OCaml code generation, transformation
+Syntax and language for implicit task-based parallelism [^like-regent], use decorator syntax [^like-modal]
+
+Python / OCaml code generation, transformation, ensure closures [^csp]
 
 File: `process_unet_nodek.py`
 
@@ -46,11 +48,13 @@ if __name__ == "__main__":
 
 ## Layer 3.5
 
-Session-based IPC message-broker / socket library
+Session-based IPC message-broker / socket library for multi-process communication
+
+eDSL for writing "cross-process procedures" [^jfp][^codecomp].
 
 ## Layer 3
 
-Task distributor
+Distribute tasks to nodes in microcluster
 
 ```
 $ microcluster_exec -F /dev/ttyACM0 ./main.py
@@ -93,3 +97,13 @@ Need to have:
 ## Layer 0
 
 Physical chassis / frame of the computer. So that we can install (bolt-in and wire-up) a cluster of MCU devices -> a cluster computer. 1 aggregator device, and (N - 1) devices. Communicate via i2c (?)
+
+[^csp]: we can check out cross-stage persistent values (CSP)
+
+[^like-modal]: Modal is an ML training service where your infrastructure is programmable with Python with lots of decorators! see https://modal.com
+
+[^like-regent]: Possibily like Regent lang, see https://regent-lang.org
+
+[^jfp]: tagless-final style, see https://okmij.org/ftp/tagless-final
+
+[^codecomp]: lightweight components, see https://www.researchgate.net/publication/220941847_Lightweight_and_Generative_Components_I_Source-Level_Components
