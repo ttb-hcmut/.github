@@ -61,4 +61,72 @@ which can be rendered into the sequence diagram below
 
 This composite architecture is optimized for modularity. The input code is guaranteed to be correctly interpreted: the code is understood by the **back-end interpreter**, an interpreter which can be customized (by changing the input command) to be any external program that the user expects to interpret their code[^1].
 
+## eDSL rules
+
+The XXX eDSL is not OCaml, is not Python, it's a mix. By its nature, it's bound to be a frankenstein mess. But we want to do good things with it.
+
+The main goal is that, most of the designs are about translation power i.e. how to output exactly the Python you want. However, a secondary goal is that writing should be pleasant i.e. the eDSL syntax should not be too crazy, and some Python patterns (e.g. arbitrary variable assignment) are too overpowered and error-prone so we should stray from those.
+
+We try to be predictable. For example, given we're using an interpreter that serializes the eDSL into Python.
+
+- Every initializer expression (`ref`, `import`, `def`) marks an identifier symbol generation
+- Every overloadable let-binding (`let*`, `let+`, `>>=`, ...) marks a new line.
+- Every block interior (`if_, for_, def_`) marks a new indent level.
+
+## eDSL libraries
+
+A. functorized modules
+
+```{ocaml}
+type spec
+
+module Json : sig
+    include Importable
+    module M (_: Context) : sig
+        val dumps : dict expr -> string expr
+        type blob
+
+        (** instance methods of Python class "blob" *)
+        module Blob : sig
+            val to_string : blob expr -> string expr 
+        end
+    end
+end
+
+let+ json = import (module Json) in
+let module Json = Json.M(val json) in
+Json.dumps v (* ... *);
+Json.Blob.to_string 
+```
+
+modules are first-class citizens of OCaml. You can "instantiate" modules through functors[^module-instantiate].
+
+you can't overload the let binding for module-letting, so there's the extra line as syntax overhead, and there's room for human error.
+
+B. class
+
+```{ocaml}
+module Json : sig
+    type blob
+end
+
+val json : context -> <
+    dumps : dict expr -> string expr
+
+    blob : <
+        to_string : Json.blob expr -> string expr
+    >
+>
+```
+
+the motivation was, if we have to instantiate the namespace before using it, wouldn't that be what classes are for?
+
+class can be used easily in non-top scope
+
+declaring and defining methods for class may be nice, but you can't have types and nested modules and nested classes in a class, you'll resort to modules for those tasks still, so the syntax switch is a bit jarring. (it's the author's informal opinion that OCaml class should only be used to wrap convenient ops together. Other than that.. well, OCaml classes are extremely limited compared to the modules-and-functors solution)
+
+C. ??
+
 [^1]: Currently there are some compromises: we only support two external programs — **Python** and **UTop** — for sane issue tracking, and the async functions must be marked with the `parallel()` decorator.  
+
+[^module-instantiate]: the word "instantiate" is used to compare with classes in OOP, it sounds like "generating new instance". But actually there are two kinds of functors: generative functors that "generate new instance" and applicative functors that "maps to a submodule". The difference is when you "instantiate" multiple times to produce multiple "instances". For generative functors, these instances are unique / different. For applicative functors, these instances may just be "pointers" to the same submodule if the parameter module is the same. For most cases, people usually mean applicative functors. In some cases when you want each instance module to carry some unique states, use generative functors

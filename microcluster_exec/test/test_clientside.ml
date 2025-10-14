@@ -1,34 +1,164 @@
 open Microcluster_exec
-open Clientside
+open Offshoring
 
-type ('a, 'b) callback = [ `Promise of string * 'a ] -> 'b program
-    
-type 'imp intercept = ([ `Object ], ('imp, [ `Unknown ]) abstract_value) callback
+module Backend = struct
+  module type E = sig
+    include Fs_socket__client.D
+    module Fs_socket : sig
+      val fetch : string expr -> dict expr -> ?name:(string expr) -> unit -> dict expr awaitable
+    end
+  end
 
-let upine (m: _ intercept) =
-  m (`Promise ("task", `Object))
+  module type Interceptor = functor (C : E) -> sig
+    open C
+    val f : func:(unknown list -> dict -> unit) ref -> unit -> dict stmt
+  end
 
-let test_generic () =
-  let session_name = "a81-yuu-znm" in
-  let intercept = Syntax.(fun task ->
-    let open Clientside_common in
-    let* task      = Task.to_dict task
-    and* task_name =
-      Attr_get.str "name" task in
-    Fs_socket.fetch !session_name ~name:task_name task
-    >>= Dict_get.str "return_value"
-    >>= Ast.literal_eval
-  ) in
-  intercept
-  |> upine
-  |> Clientside_jsont.encode_string
-  |> Alcotest.(check string) "lol" {|[{"rhs_type":"normal","lhs":"a","rhs":"task.to_dict()"},{"rhs_type":"normal","lhs":"b","rhs":"task.name"},{"rhs_type":"await","lhs":"c","rhs":"fs_socket.comm(\"a81-yuu-znm\", a, name=b)"},{"rhs_type":"normal","lhs":"ca","rhs":"c[\"return_value\"]"},{"rhs_type":"normal","lhs":"cb","rhs":"ast.literal_eval(ca)"}]|}
+  module Z (CUser : E) = struct open CUser let f (module Lo : Interceptor) =
+    let module X = Fs_socket__client.X(CUser) in
+    X.f >>=
+    let* parallel_decorator_factory = def0 () ~kwargs:object method all_ = [] end @@ fun () ~kwargs:_ ->
+      let* parallel = def1 () ~kwargs:object method all_ = [] end @@ fun func ~kwargs:_ ->
+        let* wrapper = def_varargs @@ fun args kwargs ->
+          let+ os = import (module Os) in
+          let module Os = Os.M(val os) in
+          if_ (is (Os.getenv @@ string "MICROCLUSTER_ENV") none) begin fun () ->
+            let func = mkfunc_varargs func in
+            let open Spreading in
+            return @@ func (( * ) !args) (( ** ) !kwargs)
+          end >>=
+          let* asynctemp = async_def0 () @@ fun () ->
+            let module Lo = Lo(CUser) in
+            Lo.f ~func () in
+          let asynctemp = mkfunc1 asynctemp in
+          return @@ asynctemp unit in
+        return !wrapper in
+      return !parallel in
+    let* _parallel = ref ~name:"parallel" @@ !parallel_decorator_factory in
+    ignore_ unit
+  end
 
-open Alcotest
+  let provide (module Y : Interceptor) =
+    let module State = struct let state__indent = ref 0 end in
+    let module AUser = struct
+      include Python (State)
+      include PythonLiteral
+      include PythonExt
+      include PythonStd (State)
+      module Uuid = struct
+        let spec = { namespace = "uuid" }
+        module M (I : LibEnv) = struct
+          type uuid = string
+          let uuid4 () = I.libs.namespace ^ ".uuid4()"
+          let to_string x = "str(" ^ x ^ ")"
+        end
+      end
+      module Fs_socket = struct
+        let fetch session info ?name () = "comm(" ^ ([session; info] @ (match name with None -> [] | Some name -> ["name=(" ^ name ^ ")"]) |> String.concat ", ") ^ ")"
+      end
+    end in
+    let module Z = Z(AUser) in
+    let text = Z.f (module Y) in
+    (* print_endline text; *)
+    text |> Alcotest.(check string) "lol"
+{|import asyncio as a
+async def b(c):
+  d = await (a.create_subprocess_shell(("mkfifo '") + ((c) + ("'")), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
+  _, stderr = await (d.communicate())
+  if d.returncode != 0:
+    raise Exception(stderr)
+
+async def e(f):
+  g = await (a.create_subprocess_shell(("rm '") + ((f) + ("'")), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
+  _, stderr = await (g.communicate())
+  if g.returncode != 0:
+    raise Exception(stderr)
+
+import json as h
+import os as i
+import uuid as j
+async def k(l, m, *__args, name=None):
+  n = ""
+  o = (i.getenv("HOME")) + (("/.var/fs_socket/") + ((l) + (("/") + (("" if n is None else (n) + ("-")) + (str(j.uuid4()))))))
+  await (b(o))
+  p = h.dumps(m)
+  q = ""
+  if True:
+    print("sending to main")
+    t = await (a.create_subprocess_shell(("echo '") + ((p) + (("' > '") + ((o) + ("'")))), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
+    _, stderr = await (t.communicate())
+    print("done sending to main")
+    if bool(t.returncode):
+      raise Exception(stderr)
+  if True:
+    print("waiting from main")
+    s = await (a.create_subprocess_shell(("cat '") + ((o) + ("'")), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
+    stdout, stderr = await (s.communicate())
+    print("done waiting from main")
+    if bool(s.returncode):
+      raise Exception(stderr)
+    q = stdout
+  r = h.loads(q)
+  await (e(o))
+  return (r)
+
+comm = k
+
+def u():
+  def v(w):
+    def x(*y, **z):
+      import os as za
+      if za.getenv("MICROCLUSTER_ENV") is None:
+        return (w(*(y), **(z)))
+      async def zb():
+        import ast as zc
+        import os as zd
+        ze = await (comm("A76C", { ("function_name"):(w.__name__), ("module_name"):(w.__module__), ("cwd"):(zd.getcwd()) }))
+        zf = ze["return_value"]
+        assert isinstance(zf, str)
+        zg = zc.literal_eval(zf)
+        assert isinstance(zg, dict)
+        return (zg)
+
+      return (zb())
+
+    return (x)
+
+  return (v)
+
+parallel = u
+|}
+end
 
 let () =
-  run "Clientside" [
-    "clientside.syntax", [
-      test_case "Sample" `Quick test_generic
-    ]
-  ]
+  let session = "A76C" in
+  Backend.provide(module functor (C : Backend.E) -> struct let f ~func () =
+    let open C in
+    let s_ = string in
+    let+ ast = import (module Ast) in
+    let module Ast = Ast.M(val ast) in
+    let+ os = import (module Os) in
+    let module Os = Os.M(val os) in
+    let* resp = ref @@ await @@
+      let func = Function.v2 !func in
+      Fs_socket.fetch (s_ session) (Dict.of_assoc__single_t [string "function_name", Function.r__name__ func; string "module_name", Function.r__module__ func; string "cwd", Os.getcwd ()]) () in
+    let* lol = ref @@ Dict.(!. !resp (s_ "return_value") ) in
+    let- lol = assert__isinstance lol klass__string in
+    let* xx = ref @@ Ast.literal_eval !lol in
+    let- xx = assert__isinstance xx klass__dict in
+    return !xx
+  end);
+  (*
+  Backend.provide
+    begin fun%ftor_ize (module C : Backend.E) ->
+    let open C in
+    let+ ast = import (module Ast) in
+    let module Ast = Ast.M(val ast) in
+    let* resp = ref @@ Fs_socket.fetch (string session) (_dict_of_string "{}") () in
+    let* lol = ref @@ Dict.(!. !resp (string "return_value") ) in
+    let- lol = assert__isinstance lol klass__string in
+    let* xx = ref @@ Ast.literal_eval !lol in
+    let- xx = assert__isinstance xx klass__dict in
+    return !xx
+    end
+  *)

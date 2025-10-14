@@ -25,6 +25,7 @@ depends: [
   "opine"
   "cmdliner"
   "ppx-jsont"
+  "offshr-code+py"
   "odoc" {with-doc}
 ]
 build: [

@@ -1,6 +1,6 @@
 (lang dune 3.16)
 
-(name fs_socket)
+(name offshr-code)
 
 (generate_opam_files true)
 
@@ -16,10 +16,18 @@
 (documentation https://url/to/documentation)
 
 (package
- (name fs_socket)
+ (name offshr-code)
+ (allow_empty)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends alcotest ocaml uuidm eio ppx-jsont ppx_fields_conv offshr-code+py)
+ (tags
+  ("add topics" "to describe" your project)))
+
+(package
+ (name offshr-code+py)
+ (synopsis "A short synopsis")
+ (description "A longer description")
+ (depends ocaml)
  (tags
   ("add topics" "to describe" your project)))
 

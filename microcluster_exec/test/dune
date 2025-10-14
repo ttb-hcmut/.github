@@ -2,5 +2,5 @@
  (name test_microcluster_exec))
 
 (test
- (libraries alcotest microcluster_exec microcluster_exec.clientside microcluster_exec.clientside_jsont)
+ (libraries alcotest microcluster_exec fs_socket.py offshr-code+py)
  (name test_clientside))

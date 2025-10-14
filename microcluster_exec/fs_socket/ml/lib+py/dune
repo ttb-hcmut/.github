@@ -1,0 +1,4 @@
+(library
+ (libraries offshr-code+py)
+ (public_name fs_socket.py)
+ (name fs_socket__client))

@@ -11,12 +11,6 @@ doc: "https://url/to/documentation"
 bug-reports: "https://github.com/username/reponame/issues"
 depends: [
   "dune" {>= "3.16"}
-  "alcotest"
-  "ocaml"
-  "uuidm"
-  "eio"
-  "ppx-jsont"
-  "offshr-code+py"
   "odoc" {with-doc}
 ]
 build: [

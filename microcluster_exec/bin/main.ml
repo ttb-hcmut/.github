@@ -1,47 +1,98 @@
 open Microcluster_exec
 
+let with_open_in ~cwd ~namespace f =
+  let open Eio in
+  let dir = Path.(cwd / namespace) in
+  Path.mkdirs ~exists_ok:false ~perm:0o700 dir;
+  f dir
+  |> fun return_value ->
+  Path.rmtree dir;
+  return_value
+
 type 'a backend =
   { process_mgr : 'a Eio.Process.mgr
   ; command: Command.t
+  ; cwd: Eio.Fs.dir_ty Eio.Path.t
   }
 
-let backend process_mgr command =
-  { process_mgr; command }
+let backend process_mgr command cwd =
+  { process_mgr; command; cwd }
 
-type ('arg1, 'ret) callback1 =
-  [ `Promise of string * 'arg1 ] -> 'ret Clientside.program
+module type Clientside = sig
+  include Fs_socket__client.D
+  module Fs_socket : sig
+    val fetch : string expr -> dict expr -> ?name:(string expr) -> unit -> dict expr awaitable
+  end
+end
 
-type 'a intercept = ([ `Object ], ('a, [ `Unknown ]) Clientside.abstract_value) callback1
 (** A callback [f = fun self -> ...] is an [_ intercept] which is a callback
     definition that will be executed in the remote runtime. *)
+module type Interceptor = functor (C : Clientside) -> sig
+  open C
+  val f : func:(unknown list -> dict -> unit) ref -> unit -> unknown stmt
+end
 [@@alert experimental
   "The clientside interceptor pattern is being evaluated."]
 
-let backend_run ~backend =
-  fun (interceptor: _ intercept) ->
-  let env =
-    Unix.environment ()
-    |> Array.append
-      [| Printf.sprintf
-          {|MICROCLUSTER_ENV=%s|}
-          begin
-            let open Clientside_jsont in
-            interceptor (`Promise ("self", `Object))
-            |> encode_string
-          end
-      |] in
-  Eio.Process.run backend.process_mgr ~env
-    (Command.unparse backend.command)
+module Z (CUser : Clientside) = struct open CUser let f (module Lo : Interceptor) =
+  let module X = Fs_socket__client.X(CUser) in
+  X.f >>=
+  let* parallel_decorator_factory = def0 () ~kwargs:object method all_ = [] end @@ fun () ~kwargs:_ ->
+    let* parallel = def1 () ~kwargs:object method all_ = [] end @@ fun func ~kwargs:_ ->
+      let* wrapper = def_varargs @@ fun args kwargs ->
+        let+ os = import (module Os) in
+        let module Os = Os.M(val os) in
+        if_ (is (Os.getenv @@ string "MICROCLUSTER_ENV") none) begin fun () ->
+          let func = mkfunc_varargs func in
+          let open Spreading in
+          return @@ func (( * ) !args) (( ** ) !kwargs)
+        end >>=
+        let* asynctemp = async_def0 () @@ fun () ->
+          let module Lo = Lo(CUser) in
+          Lo.f ~func () in
+        let asynctemp = mkfunc1 asynctemp in
+        return @@ asynctemp unit in
+      return !wrapper in
+    return !parallel in
+  let* _parallel = ref ~name:"parallel" @@ !parallel_decorator_factory in
+  ignore_ unit
+end
 
-let _'controller'input'dict_set'all =
-  fun module_name function_name cwd x ->
-  let open Clientside in
-  let open Clientside.Syntax in
-  Dict_set.str "cwd" cwd x
-  >>= Dict_set.str
-    "function_name" function_name
-  >>= Dict_set.str
-    "module_name" module_name
+let backend_run ~backend (module Y : Interceptor) =
+  let module State = struct let state__indent = ref 0 end in
+  let open Offshoring in
+  let module AUser = struct
+    include Python (State)
+    include PythonLiteral
+    include PythonExt
+    include PythonStd (State)
+    module Uuid = struct
+      let spec = { namespace = "uuid" }
+      module M (I : LibEnv) = struct
+        type uuid = string
+        let uuid4 () = I.libs.namespace ^ ".uuid4()"
+        let to_string x = "str(" ^ x ^ ")"
+      end
+    end
+    module Fs_socket = struct
+      let fetch session info ?name () = "comm(" ^ ([session; info] @ (match name with None -> [] | Some name -> ["name=(" ^ name ^ ")"]) |> String.concat ", ") ^ ")"
+    end
+  end in
+  let module Z = Z(AUser) in
+  let python_content = Z.f (module Y) in
+  with_open_in ~cwd:backend.cwd ~namespace:"_microcluster" @@ fun space ->
+    let filename = Eio.Path.(space / "microcluster_canvas.py") in
+    Eio.Path.save ~create:(`Exclusive 0o666) filename python_content;
+    let env =
+      Unix.environment ()
+      |> Array.append
+        [| Printf.sprintf
+            {|MICROCLUSTER_ENV=%s|} "run"
+        ;  Printf.sprintf
+            {|PYTHONPATH=%s|} (Eio.Path.native_exn space)
+        |] in
+    Eio.Process.run backend.process_mgr ~env
+      (Command.unparse backend.command)
 
 module Response = struct
   type t = { return_value: string }
@@ -264,27 +315,23 @@ let main command =
   );
   let backend = backend
     (Stdenv.process_mgr env)
-    command in
-  backend_run ~backend begin fun self ->
-    let open Clientside.Syntax in
+    command (Stdenv.cwd env) in
+  backend_run ~backend (module functor (C : Clientside) -> struct let f ~func () =
     let module Server__fs_socket = Fs_socket in
-    let open Clientside in
-    let open Clientside_common in
-    let* func_name =
-      Attr_get.str "__name__" self
-    and* module_name =
-      Attr_get.str "__module__" self
-    and* cwd =
-      Os.getcwd () in
-    ( Dict.init ()
-      >>= _'controller'input'dict_set'all
-        module_name func_name cwd )
-    >>=
-    ( let socket = Server__fs_socket.Socket.session_name socket in
-      Fs_socket.fetch !socket ~name:func_name )
-    >>= Dict_get.str "return_value"
-    >>= Ast.literal_eval
-  end
+    let open C in
+    let s_ = string in
+    let+ ast = import (module Ast) in
+    let module Ast = Ast.M(val ast) in
+    let+ os = import (module Os) in
+    let module Os = Os.M(val os) in
+    let* resp = ref @@ await @@
+      let func = Function.v2 !func in
+      Fs_socket.fetch (s_ (Server__fs_socket.Socket.session_name socket)) (Dict.of_assoc__single_t [string "function_name", Function.r__name__ func; string "module_name", Function.r__module__ func; string "cwd", Os.getcwd ()]) () in
+    let* lol = ref @@ Dict.(!. !resp (s_ "return_value") ) in
+    let- lol = assert__isinstance lol klass__string in
+    let* xx = ref @@ Ast.literal_eval !lol in
+    return !xx
+  end)
 
 open Cmdliner
 

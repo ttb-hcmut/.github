@@ -1,3 +1,3 @@
 (library
- (libraries re eio controller fpath pyre-ast microcluster_exec.eio_format microcluster_exec.clientside re_exports)
+ (libraries re eio controller fpath pyre-ast microcluster_exec.eio_format re_exports)
  (name microcluster_exec))

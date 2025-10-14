@@ -1,4 +1,0 @@
-(library
- (libraries microcluster_exec.clientside jsont jsont.bytesrw)
- (public_name microcluster_exec.clientside_jsont)
- (name clientside_jsont))

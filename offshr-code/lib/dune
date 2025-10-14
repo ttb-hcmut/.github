@@ -1,0 +1,3 @@
+(library
+ (public_name offshr-code+py)
+ (name offshr_code__py))
