@@ -16,6 +16,7 @@ depends: [
   "uuidm"
   "eio"
   "ppx-jsont"
+  "ppx_fields_conv"
   "offshr-code+py"
   "odoc" {with-doc}
 ]
