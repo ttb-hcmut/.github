@@ -1,136 +1,92 @@
-#let signing(content) = {
-  align(right, text(style: "italic", content))
-}
-
-#let title(content) = {
-  text(weight: "bold", size: 2em, content)
-}
-
-#let subtitle(content) = {
-  text(weight: "medium", size: 1.5em, content)
-}
-
-#let doc(content) = {
-  text(font: "New Computer Modern", content)
-}
-
-#let cover0(title, subtitle) = {
-  
-  //rectangle box technologia
-  place(top+left,dx:-5%,dy: -5%)[
-    #rect(height: 110%, width: 110%, stroke: 5pt)
-  ]
-  place(top+left,dx:-5%+0.5pt,dy: -5%+0.5pt)[
-    #rect(height: 110%-1pt, width: 110%-1pt, stroke: 1.5pt +white)
-  ]
-  
-  align(center)[
-    #text(size: 16pt, weight: "bold")[
-    VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY#linebreak()
-    HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY#linebreak()
-    FACULTY OF COMPUTER SCIENCE AND ENGINEERING
-    ]
-    
-    #image("hcmut.png", width: 4cm)
-  
-    #text(size: 16pt, weight: "bold")[
-      REPORT:#linebreak()
-      SPECIALIZED PROJECT:#linebreak()
-      #upper(title)#linebreak()
-      SEMESTER 251 ACADEMIC YEAR 2025-2026
-    ]
-    
-    #line(length: 80%)
-  
-    #text(size: 20pt, weight: "bold", subtitle)
-    
-    #line(length: 80%)
-    
-    #text(size:16pt)[
-      #table(
-        stroke: luma(), // stroke luma balls
-        columns: (25%,25%,50%),
-        [],align(left)[*Major:*],align(left)[Computer Science],
-        
-        [],align(left)[*Council:*],align(left)[\<councilname\>],
-        
-        [],align(left)[*Supervisor(s):*],align(left)[Dr. Trương Tuấn Anh],
-        [],[],align(left)[Cn. Nguyễn Minh Tâm],
-        [],[],[],
-        [],align(left)[*Reviewer:*],align(left)[#place(bottom,dy:5pt)[`....................`]],
-      )
-    ]
-    
-    #table(
-      stroke: luma(),
-      [
-        #align(bottom)[
-          #stack(dir: ltr)[
-            #line(length: 20%)
-          ][
-            #text(size:16pt)[o0o]
-          ][
-            #line(length: 20%)
-          ]
-        ]
-      ]
-    )
-    
-    #text(size:16pt)[
-      #table(
-        stroke: luma(), // stroke luma balls
-        columns: (25%,auto,25%),
-        align(right)[*Student 1:*],align(left)[Lê Nguyễn Gia Bảo],align(left)[2210216],
-        align(right)[*Student 2:*],align(left)[Hồ Gia Tường],align(left)[2252887],
-        align(right)[*Student 3:*],align(left)[Lê Công Minh Khang],align(left)[2252295],
-      )
-    ]
-  
-  
-    
-    #align(bottom)[
-      #text(size: 16pt)[
-        HO CHI MINH CITY, October 2025
-      ]
-    ]
-
-    #pagebreak()
-  ]
+#let doc(
+	department: none,
+	content
+) = {
+	set page(
+		paper: "a4",
+		numbering: "1",
+		margin: (
+			x: 2.5cm,
+			bottom: 2.2cm,
+		),
+		header: context {
+			if counter(page).get().first() > 1 [#rect(stroke: (bottom: 1pt))[
+				HCMUT -
+				#if department == none [(Set `department:` here)] else [#department]
+				#h(1fr)
+				Course: Computer Graphics
+			]]
+		},
+		footer: context {
+			if counter(page).get().first() > 1 [
+				#h(1fr) Page #counter(page).get().first()
+			] else [
+				#align(center)[#counter(page).get().first()]
+			]
+		}
+	)
+	set par(justify: true)
+	set text(size: 11pt, font: "New Computer Modern")
+	show heading: it => [
+		#set text(size: 16pt)
+		#v(35pt)
+		#it.body
+	]
+	content
 }
 
 #let cover1(
   title_,
-  subtitle_,
+  subtitle: none,
   instructor: none,
-  date: datetime.today(),
+  date: none,
   version: none,
+	department: none,
 ) = {
   let bold(content) = {
     text(weight: "bold", content)
   }
-  align(center)[
-    #v(2cm)
-    
-    #image("hcmut.png", width: 2cm)
-    
-    #title(bold(upper[Report: Specialized Project]))
-     
-    #title(bold(upper(title_)))
-    
-    #text(subtitle_)
-    
-    #text([Semester 251 — Academic Year 2025-2026])
 
-    #text([Department of Computer Science#linebreak()Ho Chi Minh University of Technology (HCMUT), VNU-HCM])
+	let supernormalsize(content) = {
+		text(size: 16pt, weight: "extralight", content)
+	}
+
+	let normalsize(content) = {
+		text(size: 14pt, weight: "extralight", content)
+	}
+
+	set par(justify: false)
+
+  align(center)[
+    #v(1.2cm)
+    
+    #image("hcmut-withring.svg", width: 3.2cm)
+
+    #v(0.5cm)
+    
+    #text(size: 20pt, weight: "bold", upper(title_))
+    
+		#if subtitle != none [
+			#text(subtitle)
+		]
+    
+    #supernormalsize([Semester 251 — Academic Year 2025-2026])
+
+    #normalsize([
+			#if department == none [(Set `department:` here)] else [#department]
+			#linebreak()
+			Ho Chi Minh University of Technology (HCMUT), VNU-HCM])
 
     #if instructor != none [
-      #text([#bold[Instructor:] #instructor])
+      #normalsize([#bold[Instructor:] #instructor])
     ]
 
-    #text(date.display("[month repr:long] [day], [year]"))
+    #normalsize(
+			if date == none [(Set `date:` here)] else [#date.display("[month repr:long] [day], [year]")]
+		)
 
     #if version != none [
-      #text(bold[Current version: ] + version)
+      #normalsize(bold[Current version: ] + version)
     ]
   ]
 }
