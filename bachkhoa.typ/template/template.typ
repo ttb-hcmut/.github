@@ -29,9 +29,14 @@
 	set text(size: 11pt, font: "New Computer Modern")
 	show heading: it => [
 		#set text(size: 16pt)
-		#v(35pt)
 		#it.body
 	]
+	set table(
+		inset: (y: 4pt),
+		stroke: 0.5pt
+	)
+	show table: pad.with(x: 24pt)
+	show table.cell: it => if it.y == 0 { strong(it) } else { it }
 	content
 }
 
@@ -43,10 +48,6 @@
   version: none,
 	department: none,
 ) = {
-  let bold(content) = {
-    text(weight: "bold", content)
-  }
-
 	let supernormalsize(content) = {
 		text(size: 16pt, weight: "extralight", content)
 	}
@@ -54,6 +55,8 @@
 	let normalsize(content) = {
 		text(size: 14pt, weight: "extralight", content)
 	}
+
+	let bold(content) = text(weight: "bold", content)
 
 	set par(justify: false)
 
