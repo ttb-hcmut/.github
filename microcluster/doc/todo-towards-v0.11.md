@@ -1,4 +1,5 @@
 - [ ] Documentation on writing Microcluster_exec port modules (tutorial, cookbook, reference)
+- [ ] clientside: `fun%ftor_ize (module C : Python) -> ...` macro
 - [ ] Prune capabilities: reimplement mktemp in pure OCaml for cwd; ...
 - [ ] improved monorero build system (opam-monorepo? opam overlays?)
 - [ ] formatter: migrate to ppx_regexp for better DX

@@ -5,6 +5,7 @@
 - [x] migrate from concrete ast to tagless final ast _PS: it's not "ast", but whatever_
 - [ ] migrate from make to nix
 - [ ] microcluster_canvas stubs / interface / typedef
+- [ ] mpremote doesn't return correctly on error
 
 Documentation
 - [x] rewrite `doc/design-notes.md` to follow the template [here](https://gist.github.com/kinten108101/1436f0545ffba9f40125153aa66fe915)
