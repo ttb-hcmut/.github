@@ -4,15 +4,14 @@ let with_open_in ~cwd ~namespace f =
   let open Eio in
   let dir = Path.(cwd / namespace) in
   Path.mkdirs ~exists_ok:false ~perm:0o700 dir;
-  f dir
-  |> fun return_value ->
+  f dir |> fun ret ->
   Path.rmtree dir;
-  return_value
+  ret
 
 type 'a backend =
   { process_mgr : 'a Eio.Process.mgr
-  ; command: Command.t
-  ; cwd: Eio.Fs.dir_ty Eio.Path.t
+  ; command : Command.t
+  ; cwd     : Eio.Fs.dir_ty Eio.Path.t
   }
 
 let backend process_mgr command cwd =
@@ -258,9 +257,8 @@ end
 
 open Eio
 
-let main command =
-  fun ~device ~device_driver ~verbose ->
-  device |> ignore;
+let main command
+~device:_ ~device_driver ~verbose =
   Eio_main.run @@ fun env ->
   let env = object
     method cwd = env#cwd
@@ -292,15 +290,16 @@ let main command =
   Fs_socket.Namespace.with_open_in ~vardir @@ fun socket ->
   Switch.run @@ fun sw ->
   ( Fiber.fork_daemon ~sw @@ fun () ->
-    let open Fs_socket in
-    socket |> Namespace_watch.iter begin fun x ->
-      Socket.reply x @@ fun inp ->
-      let env = (env :> Controller.env) in
-      Rpc.eval inp ~env
-    end
+    let module Fs = Fs_socket in
+    socket |> Fs.Namespace_watch.iter
       ~process_mgr:(Stdenv.process_mgr env)
       ~i:(module Rpc.Input)
       ~o:(module Rpc.Result)
+      begin fun x ->
+      Fs.Socket.reply x @@ fun inp ->
+      let env = (env :> Controller.env) in
+      Rpc.eval inp ~env
+      end
     |> ignore;
     `Stop_daemon
   );
