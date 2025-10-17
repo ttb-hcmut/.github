@@ -88,7 +88,7 @@ let backend_run ~backend (module Y : Interceptor) =
         [| Printf.sprintf
             {|MICROCLUSTER_ENV=%s|} "run"
         ;  Printf.sprintf
-            {|PYTHONPATH=%s|} (Eio.Path.native_exn space)
+            {|PYTHONPATH=%s|} (Sys.getenv "PYTHONPATH" ^ ":" ^ Eio.Path.native_exn space)
         |] in
     Eio.Process.run backend.process_mgr ~env
       (Command.unparse backend.command)
