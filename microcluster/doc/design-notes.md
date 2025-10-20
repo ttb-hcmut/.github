@@ -2,8 +2,6 @@ This template is inspired by the formats of [this](https://gist.github.com/kinte
 
 ## Formatter
 
-Here we discuss the evolution of the formatter system. The problem is how to preprocess stderr output with styling (such as colors), in a way that is composable and maintains clarity of semantics.
-
 In [568dc77](https://github.com/ttb-hcmut/.github/commits/568dc77), we introduced formatters, a preprocessing stage to add colors to stderr output.
 
 1. We use formatters that can be combined.
