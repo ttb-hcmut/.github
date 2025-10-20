@@ -1,18 +1,18 @@
-This template is inspired by the formats of [this](https://github.com/ocaml-multicore/eio/blob/main/doc/rationale.md). We use it flexibly to express design tradeoffs.
+This template is inspired by the formats of [this](https://gist.github.com/kinten108101/1436f0545ffba9f40125153aa66fe915). We use it flexibly to express design tradeoffs.
 
 ## Formatter
 
 Here we discuss the evolution of the formatter system. The problem is how to preprocess stderr output with styling (such as colors), in a way that is composable and maintains clarity of semantics.
 
-In XXXX, we introduced formatters, a preprocessing stage to add colors to stderr output.
+In [568dc77](https://github.com/ttb-hcmut/.github/commits/568dc77), we introduced formatters, a preprocessing stage to add colors to stderr output.
 
 1. We use formatters that can be combined.
-2. We use formatters that can be one-way combined by extending with additional rules (legacy)
+2. We use formatters that can be one-way combined by extending with additional rules
 3. We use the same formatter for all cases (current)
 
 Exibit 1 is ideal. However, there's currently no formatter implementation in the OCaml ecosystem that allows combination [^redirect].
 
-Exibit 2 is adopted by the current system. This is implemented by the `Microcluster_exec.Format` formatters. These are extended versions of `Stdlib.Format` formatters in that they allow you to specify addition _styling rules_. By this system, the default Microcluster_exec semantics are implemented by `Microcluster_exec.Format.<private>translate`, while the modifications to the Cmdliner recolors are implemented by `Microcluster_exec.Format.Cmdliner.Re.styles`. So, this method works. The issue is that there's a hierarchy between the default semantics and the Cmdliner recolors, where the former is prioritized / first applied. Furthermore, this styling rule system adds complexity to the preprocessing function.
+Exibit 2 was adopted for a while. This was implemented by the `Microcluster_exec.Format` formatters. These are extended versions of `Stdlib.Format` formatters in that they allow you to specify addition _styling rules_. By this system, the default Microcluster_exec semantics are implemented by `Microcluster_exec.Format.translate`, while the modifications to the Cmdliner recolors are implemented by `Microcluster_exec.Format.Cmdliner.Re.styles`. So, this method works. The issue is that there's a hierarchy between the default semantics and the Cmdliner recolors, where the former is prioritized / first applied. Furthermore, this styling rule system adds complexity to the preprocessing function.
 
 Exhibit 3 is what we concluded with. The reason we initially didn't consider this is because of performance reason, because recoloring cmdliner was an exclusive task for cmdliner. But it's upon that we realize the big picture: from a cmdliner user perspective, there's no difference between the stderr output of cmdliner, and that of the rest of the app - the two should be seen as one. The `?err` argument in `Cmdliner.eval` is an customization override, but that isn't meant to break the picture. Exhibit 3 has best declarativeness, at the slight cost of performance. But from a high-level programming perspective, performance optimization should be an addition underneath the abstraction, not a mainline abstraction.
 
@@ -21,14 +21,13 @@ Exhibit 3 is what we concluded with. The reason we initially didn't consider thi
 Regarding communication between the frontend interpreter (Micro-cluster Execute) and the backend interpreter (Python / UTop).
 
 1. Frontend and backend define the code to communicate, as long as they follow the fs_socket protocol and the Controller spec.
-
 2. Frontend defines the code to communicate, defines the protocol and spec, sends some portion to the backend  - inversion of control (current).
+
+Kinten's opinion is, unless performance is in dire shape, prefer expression over performance.
 
 In exhibit 1. It is the default way, classic client-server pattern, it is easy and straightforward. The challenge is that the protocol that the frontend and backend follows is only partially seen from each side: for the overview, you need a kind of document.
 
 In exhibit 2. All communication logic is defined by the frontend; the flow of communication can be overly and readily observed in one file `/microcluster_exec/bin/main.ml` without jumping between different code repositories. The challenge is that there will be some performance implications; and there's difficulty in language: as we define this callback in OCaml-land, we have to translate and send this callback to Python-land. At least for the latter challenge, we invented `Microcluster_exec.Clientside`, a monadic way to write portable programs with the Python abstract syntax tree being the intermediate representation. Of course, all of this is further complicating the client-server pattern just for some improvement in expression and aesthetics. This pattern is being alert-marked as experimental.
-
-Kinten's opinion is, unless performance is in dire shape, prefer expression over performance.
 
 [^redirect]: It's possible to redirect the output _channel_ of one formatter to a different channel. But how to apply this idea to different formatters is still unsolved.
 
@@ -59,7 +58,9 @@ Switch.run @@ fun sw ->
 which can be rendered into the sequence diagram below
 ![Microcluster Execution Flow](./microcluster_exec_sequence.svg)
 
-This composite architecture is optimized for modularity. The input code is guaranteed to be correctly interpreted: the code is understood by the **back-end interpreter**, an interpreter which can be customized (by changing the input command) to be any external program that the user expects to interpret their code[^1].
+This composite architecture is optimized for modularity. The input code is guaranteed to be correctly interpreted: the code is understood by the back-end interpreter, an interpreter which can be customized (by changing the input command) to be any external program that the user expects to interpret their code [^backend].
+
+[^backend]: currently there are some compromises: we only support two external programs — Python and UTop — for sane issue tracking, and the async functions must be marked with the `parallel()` decorator. 
 
 ## eDSL rules
 
@@ -75,9 +76,9 @@ We try to be predictable. For example, given we're using an interpreter that ser
 
 ## eDSL libraries
 
-A. functorized modules
+A. functorized modules (current)
 
-```{ocaml}
+```ocaml
 type spec
 
 module Json : sig
@@ -105,7 +106,7 @@ you can't overload the let binding for module-letting, so there's the extra line
 
 B. class
 
-```{ocaml}
+```ocaml
 module Json : sig
     type blob
 end
@@ -125,8 +126,6 @@ class can be used easily in non-top scope
 
 declaring and defining methods for class may be nice, but you can't have types and nested modules and nested classes in a class, you'll resort to modules for those tasks still, so the syntax switch is a bit jarring. (it's the author's informal opinion that OCaml class should only be used to wrap convenient ops together. Other than that.. well, OCaml classes are extremely limited compared to the modules-and-functors solution)
 
-C. ??
-
-[^1]: Currently there are some compromises: we only support two external programs — **Python** and **UTop** — for sane issue tracking, and the async functions must be marked with the `parallel()` decorator.  
+C. ?? 
 
 [^module-instantiate]: the word "instantiate" is used to compare with classes in OOP, it sounds like "generating new instance". But actually there are two kinds of functors: generative functors that "generate new instance" and applicative functors that "maps to a submodule". The difference is when you "instantiate" multiple times to produce multiple "instances". For generative functors, these instances are unique / different. For applicative functors, these instances may just be "pointers" to the same submodule if the parameter module is the same. For most cases, people usually mean applicative functors. In some cases when you want each instance module to carry some unique states, use generative functors
