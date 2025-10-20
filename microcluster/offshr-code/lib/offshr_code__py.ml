@@ -57,12 +57,9 @@ module Cde_withliteral = struct
     val ( != ): number expr -> number expr -> bool expr
 
     (** List comprehension expression *)
-    (* val list__ : ('a expr -> 'b expr) stmt -> for_in:'a list expr -> 'b list expr *)
 
-    (* [%lst for x in arr; do x + 1 done ] *)
     val if__ : bool expr -> then_:'a expr -> else_:('a expr) -> 'a expr
 
-    (* val f_ : ('a, unit, string expr) format -> 'a *)
     val none : none expr
   end
 end
@@ -179,8 +176,6 @@ module Cde_withstd = struct
     module Dict : sig
       val ( !. ) : dict expr -> string expr -> unknown expr
       val of_assoc__single_t : (string expr * 'a expr) list -> dict expr
-      (* module type ITEM : sig type t val v : t end *)
-      (* val of_assoc : (string expr * (module ITEM) expr) list -> (module ITEM) expr *)
     end
 
     val def_varargs :
@@ -203,6 +198,5 @@ module Cde_withstd = struct
       val r__name__ : _ t expr -> string expr
       val r__module__ : _ t expr -> string expr
     end
-    (* val ( #/ ) : string -> unit stmt *)
   end
 end
