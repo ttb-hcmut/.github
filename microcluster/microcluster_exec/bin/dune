@@ -2,5 +2,5 @@
  (public_name microcluster_exec)
  (name main)
  (preprocess
-  (pps microcluster_exec.log ppx_fields_conv))
+  (pps microcluster_exec.log ppx_fields_conv ppx_ftor))
  (libraries microcluster_exec offshr-code+py jsont+dune fs_socket eio eio_main cmdliner microcluster_exec.log_domain fs_socket.py))

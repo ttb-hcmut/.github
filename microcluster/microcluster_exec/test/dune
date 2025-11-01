@@ -2,5 +2,6 @@
  (name test_microcluster_exec))
 
 (test
+ (preprocess (pps ppx_ftor))
  (libraries alcotest microcluster_exec fs_socket.py offshr-code+py)
  (name test_clientside))

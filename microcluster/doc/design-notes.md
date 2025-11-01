@@ -126,4 +126,14 @@ declaring and defining methods for class may be nice, but you can't have types a
 
 C. ?? 
 
+## ppx-ftor
+
+In OCaml, a universe can be implemented as a module, or a function with first-class module + bounded LATs.
+
+There are benefits and costs, at user side vs. at developer side
+
+First-class module is a vendor lock-in. You get best benefits but pay high cost, at both user side and developer side. It's unfair that we have to pay such cost. The authors didn't want such great benefits in the first place, as we mostly care about the user side.
+
+ppx-ftor is a syntax sugar for benefits of user side only. For user it's function with first-class module with no LATs, for developer it's  functor. It's biased towards user experience, and this is exactly the trade-off we want.
+
 [^module-instantiate]: the word "instantiate" is used to compare with classes in OOP, it sounds like "generating new instance". But actually there are two kinds of functors: generative functors that "generate new instance" and applicative functors that "maps to a submodule". The difference is when you "instantiate" multiple times to produce multiple "instances". For generative functors, these instances are unique / different. For applicative functors, these instances may just be "pointers" to the same submodule if the parameter module is the same. For most cases, people usually mean applicative functors. In some cases when you want each instance module to carry some unique states, use generative functors

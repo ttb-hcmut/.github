@@ -1,0 +1,5 @@
+(library
+ (kind ppx_rewriter)
+ (libraries ppxlib)
+ (public_name ppx_ftor)
+ (name ppx_ftor))

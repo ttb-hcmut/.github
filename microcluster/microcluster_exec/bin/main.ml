@@ -28,7 +28,7 @@ end
     definition that will be executed in the remote runtime. *)
 module type Interceptor = functor (C : Clientside) -> sig
   open C
-  val f : func:(unknown list -> dict -> unit) ref -> unit -> unknown stmt
+  val v : func:(unknown list -> dict -> unit) ref -> unit -> unknown stmt
 end
 [@@alert experimental
   "The clientside interceptor pattern is being evaluated."]
@@ -48,7 +48,7 @@ module Z (CUser : Clientside) = struct open CUser let f (module Lo : Interceptor
         end >>=
         let* asynctemp = async_def0 () @@ fun () ->
           let module Lo = Lo(CUser) in
-          Lo.f ~func () in
+          Lo.v ~func () in
         let asynctemp = mkfunc1 asynctemp in
         return @@ asynctemp unit in
       return !wrapper in
@@ -307,7 +307,8 @@ let main command
     let backend = backend
       (Stdenv.process_mgr env)
       command (Stdenv.cwd env) in
-    backend_run ~backend (module functor (C : Clientside) -> struct let f ~func () =
+    backend_run ~backend
+      begin fun%functor (module C : Clientside) ~func () ->
       let module Server__fs_socket = Fs_socket in
       let open C in
       let s_ = string in
@@ -322,7 +323,7 @@ let main command
       let- lol = assert__isinstance lol klass__string in
       let* xx = ref @@ Ast.literal_eval !lol in
       return !xx
-    end)
+      end
   )
 
 open Cmdliner

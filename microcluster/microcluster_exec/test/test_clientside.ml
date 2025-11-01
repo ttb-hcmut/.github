@@ -148,17 +148,3 @@ let () =
     let- xx = assert__isinstance xx klass__dict in
     return !xx
   end);
-  (*
-  Backend.provide
-    begin fun%ftor_ize (module C : Backend.E) ->
-    let open C in
-    let+ ast = import (module Ast) in
-    let module Ast = Ast.M(val ast) in
-    let* resp = ref @@ Fs_socket.fetch (string session) (_dict_of_string "{}") () in
-    let* lol = ref @@ Dict.(!. !resp (string "return_value") ) in
-    let- lol = assert__isinstance lol klass__string in
-    let* xx = ref @@ Ast.literal_eval !lol in
-    let- xx = assert__isinstance xx klass__dict in
-    return !xx
-    end
-  *)
