@@ -84,17 +84,13 @@ async def k(l, m, *__args, name=None):
   p = h.dumps(m)
   q = ""
   if True:
-    print("sending to main")
     t = await (a.create_subprocess_shell(("echo '") + ((p) + (("' > '") + ((o) + ("'")))), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
     _, stderr = await (t.communicate())
-    print("done sending to main")
     if bool(t.returncode):
       raise Exception(stderr)
   if True:
-    print("waiting from main")
     s = await (a.create_subprocess_shell(("cat '") + ((o) + ("'")), stdout=a.subprocess.PIPE, stderr=a.subprocess.PIPE))
     stdout, stderr = await (s.communicate())
-    print("done waiting from main")
     if bool(s.returncode):
       raise Exception(stderr)
     q = stdout
