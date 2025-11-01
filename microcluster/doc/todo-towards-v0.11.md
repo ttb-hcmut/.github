@@ -1,9 +1,8 @@
 - [ ] Documentation on writing Microcluster_exec port modules (tutorial, cookbook, reference)
-- [ ] clientside: `fun%ftor_ize (module C : Python) -> ...` macro
+- [ ] clientside: `fun%ftor_ize (module C : Python) -> ...` macro. functorize a function with a module argument [^capture]
 - [ ] Prune capabilities: reimplement mktemp in pure OCaml for cwd; ...
 - [ ] improved monorero build system (opam-monorepo? opam overlays?)
 - [ ] formatter: migrate to ppx_regexp for better DX
-- [ ] ftor_ize: functorize a function with a module argument [^capture]
 
 Documentation:
 - [ ] document modules and functions (format, eio_format, clientside)
