@@ -14,7 +14,7 @@ depends: [
   "alcotest"
   "re"
   "fpath"
-  "jsont"
+  "jsont+dune"
   "bytesrw"
   "ppx_fields_conv"
   "eio"

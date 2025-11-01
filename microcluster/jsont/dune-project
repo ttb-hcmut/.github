@@ -1,0 +1,9 @@
+(lang dune 3.16)
+(name jsont+dune)
+(generate_opam_files true)
+
+(package
+ (name jsont+dune)
+ (synopsis "Declarative JSON data manipulation for OCaml")
+ (depends (ocaml (>= 4.14.0)) ocamlfind ocamlbuild (topkg (>= 1.1.0)) )
+ (depopts cmdliner brr bytesrw))

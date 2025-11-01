@@ -3,4 +3,4 @@
  (name main)
  (preprocess
   (pps microcluster_exec.log ppx_fields_conv))
- (libraries microcluster_exec offshr-code+py jsont fs_socket eio eio_main cmdliner microcluster_exec.log_domain fs_socket.py))
+ (libraries microcluster_exec offshr-code+py jsont+dune fs_socket eio eio_main cmdliner microcluster_exec.log_domain fs_socket.py))

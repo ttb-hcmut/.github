@@ -1,5 +1,5 @@
 (library
  (public_name microcluster_exec.controller)
  (preprocess (pps ppx-jsont))
- (libraries jsont eio microcluster_exec.eio_format microcluster_exec.log_domain)
+ (libraries jsont+dune eio microcluster_exec.eio_format microcluster_exec.log_domain)
  (name controller))

@@ -1,0 +1,6 @@
+[submodule "microcluster/jsont/jsont"]
+	path = microcluster/jsont/jsont
+	url = git@github.com:dbuenzli/jsont.git
+[submodule "microcluster/bytesrw/bytesrw"]
+	path = microcluster/bytesrw/bytesrw
+	url = git@github.com:dbuenzli/bytesrw

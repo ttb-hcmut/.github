@@ -1,0 +1,5 @@
+(library
+ (public_name jsont+dune)
+ (name jsont)
+ (modules jsont jsont_base)
+ (flags (:standard -w -32 -w -27)))
