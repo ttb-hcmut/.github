@@ -17,7 +17,7 @@ def main():
 
 Parallelize machine-learning program. Translate neural network to pipelines. Expect some kind of structured concurrency (async, thread (?))
 
-Syntax and language for implicit task-based parallelism [^like-regent], use decorator syntax [^like-modal]
+Syntax and language for implicit task-based parallelism [^like-regent], use decorator syntax [^like-modal] [^like-parallelaccelerator]
 
 Python / OCaml code generation, transformation, ensure closures [^csp]
 
@@ -101,6 +101,8 @@ Physical chassis / frame of the computer. So that we can install (bolt-in and wi
 [^csp]: we can check out cross-stage persistent values (CSP)
 
 [^like-modal]: Modal is an ML training service where your infrastructure is programmable with Python with lots of decorators! see https://modal.com
+
+[^like-parallelaccelerator]: ParallelAcelerator.jl is a non-intrusive Julian DSL where you can define vector-parallelizable functions by prefixing an `@acc` decorator. see https://julialang.org/blog/2016/03/parallelaccelerator/
 
 [^like-regent]: Possibily like Regent lang, see https://regent-lang.org
 
