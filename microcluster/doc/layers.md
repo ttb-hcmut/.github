@@ -25,7 +25,7 @@ File: `process_unet_nodek.py`
 
 ```python
 import numpy
-from accelerators import parallel as parallel
+from typing.performance import parallel as parallel
 
 @parallel()
 async def main():
