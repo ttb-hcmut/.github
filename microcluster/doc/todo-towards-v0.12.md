@@ -1,0 +1,1 @@
+- [ ] deprecate fs_socket, use UNIX domain socket (as already provided by Eio)
