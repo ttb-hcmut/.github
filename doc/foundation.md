@@ -4,4 +4,8 @@ Another close ancestor is Jane Street's Async Parallel, from the OCaml programmi
 
 Other than that. The status quo is that most distributed tasks are written in the map-reduce pattern, as adopted by systems like Apache Spark. This is industry-standard for the field of Big Data. However this requires a paradigm shift into pipeline-based programming, which has its own pros and cons. We believe that such paradigm shift should not be necessary for writing distributable programs. Indeed, many programmers are used to the async/await paradigm for writing structured concurrent programs.
 
-The OCaml language was chosen due to its capability for high-abstraction programming through module-based type programming with abstract types, so that programming between distinct runtimes is seamless and still strictly type-checked (such system is also known as *implicitly heterogeneous system*). All the while, OCaml's evalutation semantics is strict hence predictable optimization, and it has a history with low-level interop with C code, enabling further optimizations.
+The OCaml language was chosen due to its capability for high-abstraction programming through module-based type programming with abstract types, so that programming between distinct runtimes is seamless and still strictly type-checked (such system is also known as *implicitly heterogeneous system*) [^mention-elixir]. All the while, OCaml's evalutation semantics is strict hence predictable optimization [^mention-haskell], and it has a history with low-level interop with C code, enabling further optimizations.
+
+[^mention-elixir]: Elixir is also a candidate thanks to its ability to run programs across BEAM machines, however it is not statically type-checked which is what the authors were looking for.
+
+[^mention-haskell]: This is compared to Haskell which has "lazy" evaluation scheme.
