@@ -1,3 +1,11 @@
 (library
  (public_name offshr-code+py)
+ (modules offshr_code__py)
  (name offshr_code__py))
+
+(library
+ (kind ppx_rewriter)
+ (libraries ppxlib)
+ (public_name offshr-code.ppx+py)
+ (modules offshr_code__ppx__py)
+ (name offshr_code__ppx__py))
