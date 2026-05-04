@@ -1,4 +1,1 @@
 numpy
-aiofile
-fs_socket
-microcluster_canvas
